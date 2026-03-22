@@ -1,0 +1,12 @@
+pyproject.toml
+tests/test_nextflow_parser.py
+workflow_clinic/__init__.py
+workflow_clinic/cli.py
+workflow_clinic.egg-info/PKG-INFO
+workflow_clinic.egg-info/SOURCES.txt
+workflow_clinic.egg-info/dependency_links.txt
+workflow_clinic.egg-info/entry_points.txt
+workflow_clinic.egg-info/requires.txt
+workflow_clinic.egg-info/top_level.txt
+workflow_clinic/parsers/__init__.py
+workflow_clinic/parsers/nextflow.py

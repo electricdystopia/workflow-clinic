@@ -1,0 +1,2 @@
+[console_scripts]
+workflow-clinic = workflow_clinic.cli:app
