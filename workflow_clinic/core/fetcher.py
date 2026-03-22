@@ -44,7 +44,7 @@ def fetch(source: str) -> FetchedWorkflow:
     """
     if source.startswith("dockstore:"):
         return _fetch_dockstore(source)
-    elif "github.com" in source:
+    elif "github.com" in source or source.startswith("github:"):
         return _fetch_github(source)
     else:
         raise ValueError(
@@ -59,15 +59,6 @@ def fetch(source: str) -> FetchedWorkflow:
 # ── Dockstore fetcher ─────────────────────────────────────────────────────────
 
 def _fetch_dockstore(source: str) -> FetchedWorkflow:
-    """
-    Fetch the primary Nextflow descriptor from Dockstore via the TRS v2 API.
-
-    Steps:
-      1. GET /tools/{id}              → tool metadata + list of versions
-      2. Pick the most recent version
-      3. GET /tools/{id}/versions/{version_id}/NEXTFLOW/descriptor
-         → raw .nf content
-    """
     repo_path = source.removeprefix("dockstore:")
     tool_id   = f"#workflow/{repo_path}"
     encoded   = urllib.parse.quote(tool_id, safe="")
@@ -83,14 +74,28 @@ def _fetch_dockstore(source: str) -> FetchedWorkflow:
         if not versions:
             raise ValueError(f"No versions found for '{source}' on Dockstore.")
 
-        # Dockstore returns versions newest-first
-        version_name = versions[0]["name"]
-        version_id   = urllib.parse.quote(version_name, safe="")
+        # Skip dev/preview branches — prefer a clean release tag
+        # Fall back to whatever is first if nothing looks like a release
+        def _is_release(v: dict) -> bool:
+            name = v.get("name", "")
+            return (
+                not name.startswith("dev")
+                and not name.startswith("preview")
+                and not name.startswith("TEMPLATE")
+                and name != "master"
+                and name != "main"
+            )
+
+        release_versions = [v for v in versions if _is_release(v)]
+        chosen_version   = release_versions[0] if release_versions else versions[0]
+        version_name     = chosen_version["name"]
+        version_id       = urllib.parse.quote(version_name, safe="")
 
         # ── Step 2: primary descriptor ────────────────────────────────────────
+        # TRS v2 type string for Nextflow is "NFL", not "NEXTFLOW"
         desc_url  = (
             f"{_DOCKSTORE_TRS_BASE}/tools/{encoded}"
-            f"/versions/{version_id}/NEXTFLOW/descriptor"
+            f"/versions/{version_id}/NFL/descriptor"
         )
         desc_resp = client.get(desc_url)
         desc_resp.raise_for_status()

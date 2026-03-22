@@ -1,0 +1,15 @@
+{
+  "schema_version": "0.1.0",
+  "generated_at": "2026-03-22T11:38:46.531213Z",
+  "workflow_path": "methylseq.nf",
+  "gaps": [],
+  "summary": {
+    "total_gaps": 0,
+    "critical": 0,
+    "major": 0,
+    "minor": 0,
+    "info": 0,
+    "auto_fixable_count": 0,
+    "cloud_readiness_score": 1.0
+  }
+}

@@ -97,7 +97,14 @@ def parse(
 
 @app.command("critic")
 def critic(
-    path: Path = typer.Argument(..., help="Path to a .nf workflow file"),
+    source: str = typer.Argument(
+        ...,
+        help=(
+            "Path to a .nf file, or a remote source:\n\n"
+            "  dockstore:github.com/owner/repo\n\n"
+            "  https://github.com/owner/repo"
+        ),
+    ),
     format: OutputFormat = typer.Option(
         OutputFormat.terminal,
         "--format", "-f",
@@ -115,13 +122,31 @@ def critic(
     ),
 ) -> None:
     """Analyse a Nextflow workflow and report cloud-readiness gaps."""
-    if not path.exists():
-        err_console.print(f"[red]File not found:[/red] {path}")
-        raise typer.Exit(1)
 
-    # ── Parse + run engine ────────────────────────────────────────────────────
-    workflow = NextflowParser().parse_file(path)
-    report   = CriticEngine().run(workflow)
+    # ── Resolve source → ParsedWorkflow ──────────────────────────────────────
+    # Local file path
+    if not any(source.startswith(p) for p in ("dockstore:", "github:", "https://")):
+        path = Path(source)
+        if not path.exists():
+            err_console.print(f"[red]File not found:[/red] {path}")
+            raise typer.Exit(1)
+        workflow = NextflowParser().parse_file(path)
+        display_path = path
+
+    # Remote source — fetch then parse from string
+    else:
+        from workflow_clinic.core.fetcher import fetch
+        try:
+            fetched = fetch(source)
+        except Exception as exc:
+            err_console.print(f"[red]Fetch failed:[/red] {exc}")
+            raise typer.Exit(1)
+        workflow     = NextflowParser().parse(fetched.content, Path(fetched.filename))
+        display_path = Path(fetched.filename)
+        console.print(f"[dim]Fetched {fetched.filename} from {fetched.source}[/dim]\n")
+
+    # ── Run engine ────────────────────────────────────────────────────────────
+    report = CriticEngine().run(workflow)
 
     # ── --score shortcut ──────────────────────────────────────────────────────
     if score:
@@ -134,15 +159,13 @@ def critic(
     elif format == OutputFormat.markdown:
         rendered = _render_markdown(report)
     else:
-        # terminal format writes directly via rich — handle separately
-        _render_terminal(report, path)
+        _render_terminal(report, display_path)
         if output:
-            # for --output with terminal format, fall back to markdown
             output.write_text(_render_markdown(report), encoding="utf-8")
             console.print(f"\n[dim]Report saved to {output}[/dim]")
         return
 
-    # ── Write or print ────────────────────────────────────────────────────────────
+    # ── Write or print ────────────────────────────────────────────────────────
     if output:
         output.write_text(rendered, encoding="utf-8")
         console.print(f"[dim]Report saved to {output}[/dim]")
@@ -150,7 +173,6 @@ def critic(
         if format == OutputFormat.markdown:
             console.print(Markdown(rendered))
         else:
-            # JSON — bypass rich entirely so it never wraps or mangles the string
             typer.echo(rendered)
 
 # ── Renderers ─────────────────────────────────────────────────────────────────
