@@ -1,0 +1,91 @@
+{
+  "schema_version": "0.1.0",
+  "generated_at": "2026-03-22T07:06:19.368820Z",
+  "workflow_path": "tests/fixtures/nextflow/broken.nf",
+  "gaps": [
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "ALIGN",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "tests/fixtures/nextflow/broken.nf",
+        "line_start": 1,
+        "line_end": 11
+      },
+      "description": "Process 'ALIGN' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "ALIGN",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "tests/fixtures/nextflow/broken.nf",
+        "line_start": 1,
+        "line_end": 11
+      },
+      "description": "Process 'ALIGN' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "/data/ref/hg38.fa, /scratch/aligned.bam",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "IO-001",
+      "process_name": "ALIGN",
+      "category": "io_declaration",
+      "severity": "MAJOR",
+      "location": {
+        "file": "tests/fixtures/nextflow/broken.nf",
+        "line_start": 1,
+        "line_end": 11
+      },
+      "description": "Process 'ALIGN' has no output declaration. Workflow engines cannot chain this process to downstream steps or track its results without explicit outputs.",
+      "evidence": "",
+      "recommendation": "Add an output: block declaring all files this process produces, e.g.:\n    output:\n        path \"*.bam\"",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "CALL_VARIANTS",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "tests/fixtures/nextflow/broken.nf",
+        "line_start": 13,
+        "line_end": 23
+      },
+      "description": "Process 'CALL_VARIANTS' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "IO-001",
+      "process_name": "CALL_VARIANTS",
+      "category": "io_declaration",
+      "severity": "MAJOR",
+      "location": {
+        "file": "tests/fixtures/nextflow/broken.nf",
+        "line_start": 13,
+        "line_end": 23
+      },
+      "description": "Process 'CALL_VARIANTS' has no output declaration. Workflow engines cannot chain this process to downstream steps or track its results without explicit outputs.",
+      "evidence": "",
+      "recommendation": "Add an output: block declaring all files this process produces, e.g.:\n    output:\n        path \"*.bam\"",
+      "auto_fixable": false
+    }
+  ],
+  "summary": {
+    "total_gaps": 5,
+    "critical": 2,
+    "major": 3,
+    "minor": 0,
+    "info": 0,
+    "auto_fixable_count": 2,
+    "cloud_readiness_score": 0.2
+  }
+}

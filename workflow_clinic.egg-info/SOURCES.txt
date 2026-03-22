@@ -1,4 +1,6 @@
 pyproject.toml
+tests/test_cli.py
+tests/test_critic_engine.py
 tests/test_nextflow_parser.py
 workflow_clinic/__init__.py
 workflow_clinic/cli.py
@@ -8,5 +10,14 @@ workflow_clinic.egg-info/dependency_links.txt
 workflow_clinic.egg-info/entry_points.txt
 workflow_clinic.egg-info/requires.txt
 workflow_clinic.egg-info/top_level.txt
+workflow_clinic/critic/__init__.py
+workflow_clinic/critic/engine.py
+workflow_clinic/critic/rules/__init__.py
+workflow_clinic/critic/rules/base.py
+workflow_clinic/critic/rules/containerization.py
+workflow_clinic/critic/rules/io_declaration.py
+workflow_clinic/critic/rules/storage.py
 workflow_clinic/parsers/__init__.py
 workflow_clinic/parsers/nextflow.py
+workflow_clinic/schema/__init__.py
+workflow_clinic/schema/gap_report.py
