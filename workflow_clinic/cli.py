@@ -137,13 +137,17 @@ def critic(
     else:
         from workflow_clinic.core.fetcher import fetch
         try:
-            fetched = fetch(source)
+            # full_repo=True fetches all .nf files — needed for nf-core DSL2
+            fetched = fetch(source, full_repo=True)
         except Exception as exc:
             err_console.print(f"[red]Fetch failed:[/red] {exc}")
             raise typer.Exit(1)
         workflow     = NextflowParser().parse(fetched.content, Path(fetched.filename))
         display_path = Path(fetched.filename)
-        console.print(f"[dim]Fetched {fetched.filename} from {fetched.source}[/dim]\n")
+        console.print(
+            f"[dim]Fetched {len(fetched.files)} .nf file(s) "
+            f"from {fetched.source}[/dim]\n"
+        )
 
     # ── Run engine ────────────────────────────────────────────────────────────
     report = CriticEngine().run(workflow)

@@ -1,7 +1,7 @@
 {
   "schema_version": "0.1.0",
-  "generated_at": "2026-03-24T13:14:35.818797Z",
-  "workflow_path": "methylseq.nf",
+  "generated_at": "2026-03-24T13:14:43.498460Z",
+  "workflow_path": "roundabout.nf",
   "gaps": [],
   "summary": {
     "total_gaps": 0,

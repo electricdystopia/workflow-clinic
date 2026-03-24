@@ -21,6 +21,9 @@ WORKFLOWS = [
     "dockstore:github.com/nf-core/methylseq",
     "dockstore:github.com/nf-core/atacseq",
     "dockstore:github.com/nf-core/chipseq",
+    "dockstore:github.com/AAFC-Bioinfo-AAC/metagenomics-nf",
+    "dockstore:github.com/bethsheets/workflows-demo",
+    "dockstore:github.com/erinyoung/roundabout"
 ]
 
 results_dir = Path("results")
@@ -32,7 +35,7 @@ engine = CriticEngine()
 for source in WORKFLOWS:
     print(f"Fetching {source} ...", end=" ", flush=True)
     try:
-        fetched  = fetch(source)
+        fetched  = fetch(source, full_repo=True)
         workflow = parser.parse(fetched.content, Path(fetched.filename))
         report   = engine.run(workflow)
 
