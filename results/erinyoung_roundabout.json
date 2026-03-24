@@ -1,15 +1,181 @@
 {
   "schema_version": "0.1.0",
-  "generated_at": "2026-03-24T13:14:43.498460Z",
-  "workflow_path": "roundabout.nf",
-  "gaps": [],
+  "generated_at": "2026-03-24T13:49:55.112202Z",
+  "workflow_path": "main.nf",
+  "gaps": [
+    {
+      "gap_id": "CONTAINER-002",
+      "process_name": "amrfinder",
+      "category": "reproducibility",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 61,
+        "line_end": 86
+      },
+      "description": "Process 'amrfinder' uses a container image with a latest tag ('staphb/ncbi-amrfinderplus:latest'). This is not reproducible \u2014 the same tag can point to a different image over time.",
+      "evidence": "container 'staphb/ncbi-amrfinderplus:latest'",
+      "recommendation": "Pin to a specific version tag or SHA digest, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n    container 'quay.io/biocontainers/tool@sha256:abc123'",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-002",
+      "process_name": "bedtools_nuc",
+      "category": "reproducibility",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 90,
+        "line_end": 128
+      },
+      "description": "Process 'bedtools_nuc' uses a container image with a latest tag ('staphb/bedtools:latest'). This is not reproducible \u2014 the same tag can point to a different image over time.",
+      "evidence": "container 'staphb/bedtools:latest'",
+      "recommendation": "Pin to a specific version tag or SHA digest, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n    container 'quay.io/biocontainers/tool@sha256:abc123'",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-002",
+      "process_name": "blastn",
+      "category": "reproducibility",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 132,
+        "line_end": 157
+      },
+      "description": "Process 'blastn' uses a container image with a latest tag ('ncbi/blast:latest'). This is not reproducible \u2014 the same tag can point to a different image over time.",
+      "evidence": "container 'ncbi/blast:latest'",
+      "recommendation": "Pin to a specific version tag or SHA digest, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n    container 'quay.io/biocontainers/tool@sha256:abc123'",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "blastn",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 132,
+        "line_end": 157
+      },
+      "description": "Process 'blastn' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "/non_, /non_, /non_",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "circos",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 161,
+        "line_end": 192
+      },
+      "description": "Process 'circos' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "circos",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 161,
+        "line_end": 192
+      },
+      "description": "Process 'circos' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "/karyotype.txt, /amrfinder_text.txt, /amrfinder.txt ... (7 more)",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-002",
+      "process_name": "plasmidfinder",
+      "category": "reproducibility",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 195,
+        "line_end": 214
+      },
+      "description": "Process 'plasmidfinder' uses a container image with a latest tag ('staphb/plasmidfinder:latest'). This is not reproducible \u2014 the same tag can point to a different image over time.",
+      "evidence": "container 'staphb/plasmidfinder:latest'",
+      "recommendation": "Pin to a specific version tag or SHA digest, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n    container 'quay.io/biocontainers/tool@sha256:abc123'",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-002",
+      "process_name": "prokka",
+      "category": "reproducibility",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 218,
+        "line_end": 239
+      },
+      "description": "Process 'prokka' uses a container image with a latest tag ('staphb/prokka:latest'). This is not reproducible \u2014 the same tag can point to a different image over time.",
+      "evidence": "container 'staphb/prokka:latest'",
+      "recommendation": "Pin to a specific version tag or SHA digest, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n    container 'quay.io/biocontainers/tool@sha256:abc123'",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-002",
+      "process_name": "prep",
+      "category": "reproducibility",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 243,
+        "line_end": 277
+      },
+      "description": "Process 'prep' uses a container image with a latest tag ('staphb/samtools:latest'). This is not reproducible \u2014 the same tag can point to a different image over time.",
+      "evidence": "container 'staphb/samtools:latest'",
+      "recommendation": "Pin to a specific version tag or SHA digest, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n    container 'quay.io/biocontainers/tool@sha256:abc123'",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "prep",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 243,
+        "line_end": 277
+      },
+      "description": "Process 'prep' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "//g, //g",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "highlight",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 319,
+        "line_end": 341
+      },
+      "description": "Process 'highlight' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "/combined.bed, /blast_hits.txt, /highlights.txt ... (1 more)",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    }
+  ],
   "summary": {
-    "total_gaps": 0,
-    "critical": 0,
-    "major": 0,
+    "total_gaps": 11,
+    "critical": 1,
+    "major": 10,
     "minor": 0,
     "info": 0,
-    "auto_fixable_count": 0,
-    "cloud_readiness_score": 1.0
+    "auto_fixable_count": 1,
+    "cloud_readiness_score": 0.0
   }
 }

@@ -1,7 +1,7 @@
 {
   "schema_version": "0.1.0",
-  "generated_at": "2026-03-24T13:14:32.483580Z",
-  "workflow_path": "rnaseq.nf",
+  "generated_at": "2026-03-24T13:48:49.659178Z",
+  "workflow_path": "main.nf",
   "gaps": [],
   "summary": {
     "total_gaps": 0,

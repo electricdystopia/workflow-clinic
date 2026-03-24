@@ -49,7 +49,7 @@ def fetch(source: str, full_repo: bool = False) -> FetchedWorkflow:
     live in modules/ and subworkflows/ rather than main.nf.
     """
     if source.startswith("dockstore:"):
-        return _fetch_dockstore(source)
+        return _fetch_dockstore(source, full_repo=full_repo)
     elif "github.com" in source or source.startswith("github:"):
         if full_repo:
             return _fetch_github_full(source)
@@ -66,51 +66,95 @@ def fetch(source: str, full_repo: bool = False) -> FetchedWorkflow:
 
 # ── Dockstore fetcher ─────────────────────────────────────────────────────────
 
-def _fetch_dockstore(source: str) -> FetchedWorkflow:
+def _fetch_dockstore(source: str, full_repo: bool = False) -> FetchedWorkflow:
     repo_path = source.removeprefix("dockstore:")
     tool_id   = f"#workflow/{repo_path}"
     encoded   = urllib.parse.quote(tool_id, safe="")
 
     with httpx.Client(timeout=30) as client:
+        # ── Step 1: resolve best version (unchanged) ─────────────────────────
         tool_resp = client.get(f"{_DOCKSTORE_TRS_BASE}/tools/{encoded}")
         tool_resp.raise_for_status()
-        tool_data = tool_resp.json()
-
-        versions = tool_data.get("versions", [])
+        versions  = tool_resp.json().get("versions", [])
         if not versions:
             raise ValueError(f"No versions found for '{source}' on Dockstore.")
 
         def _is_release(v: dict) -> bool:
             name = v.get("name", "")
-            return (
-                not name.startswith("dev")
-                and not name.startswith("preview")
-                and not name.startswith("TEMPLATE")
-                and name != "master"
-                and name != "main"
-            )
+            return not any(name.startswith(p) for p in
+                           ("dev", "preview", "TEMPLATE")) \
+                   and name not in ("master", "main")
 
         release_versions = [v for v in versions if _is_release(v)]
         chosen_version   = release_versions[0] if release_versions else versions[0]
-        version_name     = chosen_version["name"]
-        version_id       = urllib.parse.quote(version_name, safe="")
+        version_id       = urllib.parse.quote(chosen_version["name"], safe="")
 
-        desc_url  = (
+        if not full_repo:
+            # ── Original single-file path ─────────────────────────────────────
+            desc_url  = (
+                f"{_DOCKSTORE_TRS_BASE}/tools/{encoded}"
+                f"/versions/{version_id}/NFL/descriptor"
+            )
+            desc_resp = client.get(desc_url)
+            desc_resp.raise_for_status()
+            content = desc_resp.json().get("content", "")
+            if not content:
+                raise ValueError(
+                    f"Dockstore returned an empty descriptor for '{source}'."
+                )
+            filename = repo_path.split("/")[-1] + ".nf"
+            return FetchedWorkflow(source=source, filename=filename, content=content)
+
+        # ── Full-repo path: use the TRS /files endpoint ───────────────────────
+        files_url  = (
             f"{_DOCKSTORE_TRS_BASE}/tools/{encoded}"
-            f"/versions/{version_id}/NFL/descriptor"
+            f"/versions/{version_id}/NFL/files"
         )
-        desc_resp = client.get(desc_url)
-        desc_resp.raise_for_status()
-        desc_data = desc_resp.json()
+        files_resp = client.get(files_url)
+        files_resp.raise_for_status()
+        file_list  = files_resp.json()   # list of {"path": "...", "file_type": "..."}
 
-        content = desc_data.get("content", "")
-        if not content:
+        # Collect only .nf files (primary + secondary descriptors)
+        nf_entries = [
+            f for f in file_list
+            if f.get("path", "").endswith(".nf")
+            and f.get("file_type") in ("PRIMARY_DESCRIPTOR", "SECONDARY_DESCRIPTOR")
+        ]
+
+        if not nf_entries:
             raise ValueError(
-                f"Dockstore returned an empty descriptor for '{source}'."
+                f"No .nf files found via TRS /files for '{source}'."
             )
 
-        filename = repo_path.split("/")[-1] + ".nf"
-        return FetchedWorkflow(source=source, filename=filename, content=content)
+        # Fetch each file individually via the /descriptor/{relative_path} endpoint
+        files: list[tuple[str, str]] = []
+        for entry in nf_entries:
+            rel_path    = entry["path"]
+            encoded_path = urllib.parse.quote(rel_path, safe="")
+            file_url    = (
+                f"{_DOCKSTORE_TRS_BASE}/tools/{encoded}"
+                f"/versions/{version_id}/NFL/descriptor/{encoded_path}"
+            )
+            r = client.get(file_url)
+            if r.status_code == 200:
+                file_content = r.json().get("content", "")
+                if file_content:
+                    files.append((rel_path, file_content))
+
+        if not files:
+            raise ValueError(
+                f"Could not fetch any .nf file content from Dockstore for '{source}'."
+            )
+
+        chunks   = [f"// === FILE: {path} ===\n{content}" for path, content in files]
+        combined = "\n\n".join(chunks)
+
+        return FetchedWorkflow(
+            source=source,
+            filename="main.nf",
+            content=combined,
+            files=files,
+        )
 
 
 # ── GitHub single-file fetcher (original) ────────────────────────────────────

@@ -1,15 +1,181 @@
 {
   "schema_version": "0.1.0",
-  "generated_at": "2026-03-24T13:14:35.818797Z",
-  "workflow_path": "methylseq.nf",
-  "gaps": [],
+  "generated_at": "2026-03-24T13:48:56.445371Z",
+  "workflow_path": "main.nf",
+  "gaps": [
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "BISMARK_GENOMEPREPARATION",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 150,
+        "line_end": 210
+      },
+      "description": "Process 'BISMARK_GENOMEPREPARATION' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "BISMARK_GENOMEPREPARATION",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 150,
+        "line_end": 210
+      },
+      "description": "Process 'BISMARK_GENOMEPREPARATION' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "//, /Copyright., //",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "BWA_INDEX",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 214,
+        "line_end": 268
+      },
+      "description": "Process 'BWA_INDEX' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "BWA_INDEX",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 214,
+        "line_end": 268
+      },
+      "description": "Process 'BWA_INDEX' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "//, /Contact, //",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "BWAMETH_INDEX",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 272,
+        "line_end": 326
+      },
+      "description": "Process 'BWAMETH_INDEX' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "GUNZIP",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 330,
+        "line_end": 384
+      },
+      "description": "Process 'GUNZIP' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "GUNZIP",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 330,
+        "line_end": 384
+      },
+      "description": "Process 'GUNZIP' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "//, //",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "SAMTOOLS_FAIDX",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 388,
+        "line_end": 448
+      },
+      "description": "Process 'SAMTOOLS_FAIDX' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "SAMTOOLS_FAIDX",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 388,
+        "line_end": 448
+      },
+      "description": "Process 'SAMTOOLS_FAIDX' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "//, /Using., //",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "UNTAR",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 452,
+        "line_end": 535
+      },
+      "description": "Process 'UNTAR' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "UNTAR",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 452,
+        "line_end": 535
+      },
+      "description": "Process 'UNTAR' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "//, //",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    }
+  ],
   "summary": {
-    "total_gaps": 0,
-    "critical": 0,
-    "major": 0,
+    "total_gaps": 11,
+    "critical": 6,
+    "major": 5,
     "minor": 0,
     "info": 0,
-    "auto_fixable_count": 0,
-    "cloud_readiness_score": 1.0
+    "auto_fixable_count": 6,
+    "cloud_readiness_score": 0.0
   }
 }

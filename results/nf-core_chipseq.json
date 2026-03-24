@@ -1,15 +1,76 @@
 {
   "schema_version": "0.1.0",
-  "generated_at": "2026-03-24T13:14:38.793847Z",
-  "workflow_path": "chipseq.nf",
-  "gaps": [],
+  "generated_at": "2026-03-24T13:49:28.385421Z",
+  "workflow_path": "main.nf",
+  "gaps": [
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "FASTQC",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 112,
+        "line_end": 175
+      },
+      "description": "Process 'FASTQC' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "FASTQC",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 112,
+        "line_end": 175
+      },
+      "description": "Process 'FASTQC' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "//, //, // ... (6 more)",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "MULTIQC",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 179,
+        "line_end": 241
+      },
+      "description": "Process 'MULTIQC' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "MULTIQC",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 179,
+        "line_end": 241
+      },
+      "description": "Process 'MULTIQC' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "/multiqc, //g",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    }
+  ],
   "summary": {
-    "total_gaps": 0,
-    "critical": 0,
-    "major": 0,
+    "total_gaps": 4,
+    "critical": 2,
+    "major": 2,
     "minor": 0,
     "info": 0,
-    "auto_fixable_count": 0,
-    "cloud_readiness_score": 1.0
+    "auto_fixable_count": 2,
+    "cloud_readiness_score": 0.3
   }
 }
