@@ -2,15 +2,6 @@
 Model-agnostic LLM client.
 Reads OLLAMA_MODEL, OPENAI_API_KEY, ANTHROPIC_API_KEY, or GEMINI_API_KEY
 from the environment and routes to the correct provider automatically.
-
-Provider priority: OLLAMA → OpenAI → Anthropic → Gemini
-
-If no key is set the client raises a clear error at call time, not at import
-time — so the rest of the tool still works without any key.
-
-All providers are wrapped with exponential backoff so transient 429 / 503
-errors (common on free-tier APIs when the Doctor fires multiple calls in quick
-succession) are retried automatically rather than surfaced as failures.
 """
 
 from __future__ import annotations
@@ -18,20 +9,16 @@ from __future__ import annotations
 import os
 import time
 import random
+from typing import Callable, TypeVar
 
 import httpx
+
+T = TypeVar("T")
 
 
 # ── Retry helper ──────────────────────────────────────────────────────────────
 
-def _with_backoff(fn, *, max_attempts: int = 4, base_delay: float = 2.0):
-    """
-    Call fn() up to max_attempts times.  On a 429 or 503 response, wait with
-    full-jitter exponential backoff before retrying.  Any other HTTP error is
-    re-raised immediately.
-
-    Delay schedule (approximate): 1s, 2s, 4s  (randomised ±50%)
-    """
+def _with_backoff(fn: Callable[[], T], *, max_attempts: int = 4, base_delay: float = 2.0) -> T:
     for attempt in range(max_attempts):
         try:
             return fn()
@@ -40,10 +27,10 @@ def _with_backoff(fn, *, max_attempts: int = 4, base_delay: float = 2.0):
                 raise
             if attempt == max_attempts - 1:
                 raise
-            # full-jitter: sleep between 0 and base * 2^attempt seconds
             cap = base_delay * (2 ** attempt)
             delay = random.uniform(0, cap)
             time.sleep(delay)
+    raise RuntimeError("unreachable")
 
 
 # ── Client ────────────────────────────────────────────────────────────────────
@@ -51,10 +38,6 @@ def _with_backoff(fn, *, max_attempts: int = 4, base_delay: float = 2.0):
 class LLMClient:
 
     def complete(self, prompt: str) -> str:
-        """
-        Send a prompt and return the text response.
-        Tries OLLAMA first, then OpenAI, then Anthropic, then Gemini.
-        """
         if os.getenv("OLLAMA_MODEL"):
             return self._ollama(prompt)
         elif os.getenv("OPENAI_API_KEY"):
@@ -65,34 +48,31 @@ class LLMClient:
             return self._gemini(prompt)
         else:
             raise EnvironmentError(
-                "No LLM configured. Set one of:\n"
-                "  export GEMINI_API_KEY=...        (free tier, rate-limited)\n"
-                "  export OLLAMA_MODEL=llama3.2     (fully local, no limits)\n"
+                "No LLM configured. Options:\n"
+                "  export GEMINI_API_KEY=...        (free, no card)\n"
+                "  export OLLAMA_MODEL=llama3.2     (fully local)\n"
                 "  export OPENAI_API_KEY=...\n"
                 "  export ANTHROPIC_API_KEY=..."
             )
 
-    # ── Ollama (local) ────────────────────────────────────────────────────────
-
     def _ollama(self, prompt: str) -> str:
-        model = os.environ["OLLAMA_MODEL"]
+        model    = os.environ["OLLAMA_MODEL"]
         base_url = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 
-        def _call():
+        def _call() -> str:
             resp = httpx.post(
                 f"{base_url}/api/generate",
                 json={"model": model, "prompt": prompt, "stream": False},
-                timeout=120,   # local models can be slow on first load
+                timeout=120,
             )
             resp.raise_for_status()
-            return resp.json()["response"].strip()
+            result: str = resp.json()["response"].strip()
+            return result
 
         return _with_backoff(_call)
 
-    # ── OpenAI ────────────────────────────────────────────────────────────────
-
     def _openai(self, prompt: str) -> str:
-        def _call():
+        def _call() -> str:
             resp = httpx.post(
                 "https://api.openai.com/v1/chat/completions",
                 headers={
@@ -108,14 +88,13 @@ class LLMClient:
                 timeout=30,
             )
             resp.raise_for_status()
-            return resp.json()["choices"][0]["message"]["content"].strip()
+            result: str = resp.json()["choices"][0]["message"]["content"].strip()
+            return result
 
         return _with_backoff(_call)
 
-    # ── Anthropic ─────────────────────────────────────────────────────────────
-
     def _anthropic(self, prompt: str) -> str:
-        def _call():
+        def _call() -> str:
             resp = httpx.post(
                 "https://api.anthropic.com/v1/messages",
                 headers={
@@ -131,14 +110,13 @@ class LLMClient:
                 timeout=30,
             )
             resp.raise_for_status()
-            return resp.json()["content"][0]["text"].strip()
+            result: str = resp.json()["content"][0]["text"].strip()
+            return result
 
         return _with_backoff(_call)
 
-    # ── Gemini ────────────────────────────────────────────────────────────────
-
     def _gemini(self, prompt: str) -> str:
-        def _call():
+        def _call() -> str:
             resp = httpx.post(
                 "https://generativelanguage.googleapis.com/v1beta/models"
                 "/gemini-2.0-flash:generateContent",
@@ -147,6 +125,7 @@ class LLMClient:
                 timeout=30,
             )
             resp.raise_for_status()
-            return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+            result: str = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+            return result
 
         return _with_backoff(_call)

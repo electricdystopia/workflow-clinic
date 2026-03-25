@@ -20,6 +20,7 @@ from workflow_clinic.schema.gap_report import GapReport, Severity
 
 from workflow_clinic.doctor.engine import DoctorEngine
 from workflow_clinic.doctor.fix_generators.base import FixProposal
+from datetime import datetime, timezone
 
 import dataclasses
 
@@ -398,14 +399,13 @@ def doctor(
         console.print()
  
  
-def _serialize_proposals(proposals: list[FixProposal]) -> list[dict]:
+def _serialize_proposals(proposals: list[FixProposal]) -> list[dict[str, object]]:
     """Convert a list of FixProposal dataclasses to JSON-safe dicts."""
     return [dataclasses.asdict(p) for p in proposals]
  
  
 def _render_doctor_json(proposals: list[FixProposal], workflow_path: Path) -> str:
     """Serialise fix proposals to a JSON string matching the gap report style."""
-    from datetime import datetime, timezone
     doc = {
         "schema_version": "0.1.0",
         "generated_at": datetime.now(timezone.utc).isoformat(),

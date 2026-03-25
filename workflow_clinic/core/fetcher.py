@@ -79,7 +79,7 @@ def _fetch_dockstore(source: str, full_repo: bool = False) -> FetchedWorkflow:
         if not versions:
             raise ValueError(f"No versions found for '{source}' on Dockstore.")
 
-        def _is_release(v: dict) -> bool:
+        def _is_release(v: dict[str, str]) -> bool:
             name = v.get("name", "")
             return not any(name.startswith(p) for p in
                            ("dev", "preview", "TEMPLATE")) \
@@ -284,4 +284,5 @@ def _resolve_default_branch(client: httpx.Client, owner: str, repo: str) -> str:
         headers={"Accept": "application/vnd.github+json"},
     )
     resp.raise_for_status()
-    return resp.json().get("default_branch", "main")
+    result: str = resp.json().get("default_branch", "main")
+    return result
