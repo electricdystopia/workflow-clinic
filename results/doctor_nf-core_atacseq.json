@@ -1,0 +1,524 @@
+{
+  "schema_version": "0.1.0",
+  "generated_at": "2026-03-25T06:13:31.178569+00:00",
+  "workflow_path": "main.nf",
+  "source": "dockstore:github.com/nf-core/atacseq",
+  "proposals": [
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "BAM_REMOVE_ORPHANS",
+      "description": "Add container directive: 'The process BAM_REMOVE_ORPHANS seems to use a combination of tools from the SAMtools and BEDTools packages, which could be best represented by the following Docker image: quay.io/biocontainers/samtools:1.9--h24a8f05_7. This includes basic functionality for handling sequence alignment/map (SAM) format files as well as manipulating features in BED and GFF3 formats, which are commonly used with bioinformatics data.'",
+      "unified_diff": "--- BAM_REMOVE_ORPHANS (original)\n+++ BAM_REMOVE_ORPHANS (fixed)\n@@ -186,6 +186,7 @@\n \n // === FILE: modules/local/bam_remove_orphans.nf ===\n process BAM_REMOVE_ORPHANS {\n+    container 'The process BAM_REMOVE_ORPHANS seems to use a combination of tools from the SAMtools and BEDTools packages, which could be best represented by the following Docker image: quay.io/biocontainers/samtools:1.9--h24a8f05_7. This includes basic functionality for handling sequence alignment/map (SAM) format files as well as manipulating features in BED and GFF3 formats, which are commonly used with bioinformatics data.'\n     tag \"$meta.id\"\n     label 'process_medium'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "BAMTOOLS_FILTER",
+      "description": "Add container directive: 'quay.io/biocontainers/bedtools:2.32.0--py39h7e4fedd_0'",
+      "unified_diff": "--- BAMTOOLS_FILTER (original)\n+++ BAMTOOLS_FILTER (fixed)\n@@ -244,6 +244,7 @@\n \n // === FILE: modules/local/bamtools_filter.nf ===\n process BAMTOOLS_FILTER {\n+    container 'quay.io/biocontainers/bedtools:2.32.0--py39h7e4fedd_0'\n     tag \"$meta.id\"\n     label 'process_medium'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "BEDTOOLS_GENOMECOV",
+      "description": "Add container directive: 'quay.io/biocontainers/bedtools:2.32.0--heaad7d4_0'",
+      "unified_diff": "--- BEDTOOLS_GENOMECOV (original)\n+++ BEDTOOLS_GENOMECOV (fixed)\n@@ -301,6 +301,7 @@\n \n // === FILE: modules/local/bedtools_genomecov.nf ===\n process BEDTOOLS_GENOMECOV {\n+    container 'quay.io/biocontainers/bedtools:2.32.0--heaad7d4_0'\n     tag \"$meta.id\"\n     label 'process_medium'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "DESEQ2_QC",
+      "description": "Add container directive: 'I'm sorry for any confusion, but the information you provided is not sufficient to pin a specific Docker image that includes all the tools used in this script. Nextflow scripts can involve various tools and these may have different versions. The container directive should specify a precise version of an existing Docker image, such as \"quay.io/biocontainers/deseq2:1.30.0--r41hdf576e_1\" or \"rocker/tidyverse:4.1.1\". However, without the specific version of R and DESeq2 that you're using, I can't provide a pinned Docker image name.'",
+      "unified_diff": "--- DESEQ2_QC (original)\n+++ DESEQ2_QC (fixed)\n@@ -373,6 +373,7 @@\n \n // === FILE: modules/local/deseq2_qc.nf ===\n process DESEQ2_QC {\n+    container 'I'm sorry for any confusion, but the information you provided is not sufficient to pin a specific Docker image that includes all the tools used in this script. Nextflow scripts can involve various tools and these may have different versions. The container directive should specify a precise version of an existing Docker image, such as \"quay.io/biocontainers/deseq2:1.30.0--r41hdf576e_1\" or \"rocker/tidyverse:4.1.1\". However, without the specific version of R and DESeq2 that you're using, I can't provide a pinned Docker image name.'\n     tag \"$meta.id\"\n     label 'process_medium'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "FRIP_SCORE",
+      "description": "Add container directive: 'The given script uses bedtools and samtools. The official images for these tools are available in the biocontainers repository on quay.io. Here's how you can pin them to a specific version:\n\n1. For `bedtools`, we'll use 2.30.0 as an example version.\n```\nquay.io/biocontainers/bedtools:2.30.0--hdfd78af_0\n```\n\n2. For `samtools`, let's choose version 1.16 as the example. Please note that samtools versions after 1.9 are not available in biocontainers repository yet. So if you need a newer version, you may have to compile from source or use an image with older version tag.\n```\nquay.io/biocontainers/samtools:1.16--h0a4e8fab_0\n```'",
+      "unified_diff": "--- FRIP_SCORE (original)\n+++ FRIP_SCORE (fixed)\n@@ -435,6 +435,7 @@\n \n // === FILE: modules/local/frip_score.nf ===\n process FRIP_SCORE {\n+    container 'The given script uses bedtools and samtools. The official images for these tools are available in the biocontainers repository on quay.io. Here's how you can pin them to a specific version:\n\n1. For `bedtools`, we'll use 2.30.0 as an example version.\n```\nquay.io/biocontainers/bedtools:2.30.0--hdfd78af_0\n```\n\n2. For `samtools`, let's choose version 1.16 as the example. Please note that samtools versions after 1.9 are not available in biocontainers repository yet. So if you need a newer version, you may have to compile from source or use an image with older version tag.\n```\nquay.io/biocontainers/samtools:1.16--h0a4e8fab_0\n```'\n     tag \"$meta.id\"\n     label 'process_medium'\n \n",
+      "validation_passed": false,
+      "validation_output": "Container directive present but value mismatch: expected 'The given script uses bedtools and samtools. The official images for these tools are available in the biocontainers repository on quay.io. Here's how you can pin them to a specific version:\n\n1. For `bedtools`, we'll use 2.30.0 as an example version.\n```\nquay.io/biocontainers/bedtools:2.30.0--hdfd78af_0\n```\n\n2. For `samtools`, let's choose version 1.16 as the example. Please note that samtools versions after 1.9 are not available in biocontainers repository yet. So if you need a newer version, you may have to compile from source or use an image with older version tag.\n```\nquay.io/biocontainers/samtools:1.16--h0a4e8fab_0\n```', got 'None'.",
+      "confidence": 0.4,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "GENOME_BLACKLIST_REGIONS",
+      "description": "Add container directive: 'quay.io/biocontainers/bedtools:2.30.0--he4ec7a3_0'",
+      "unified_diff": "--- GENOME_BLACKLIST_REGIONS (original)\n+++ GENOME_BLACKLIST_REGIONS (fixed)\n@@ -483,6 +483,7 @@\n \n // === FILE: modules/local/genome_blacklist_regions.nf ===\n process GENOME_BLACKLIST_REGIONS {\n+    container 'quay.io/biocontainers/bedtools:2.30.0--he4ec7a3_0'\n     tag \"$sizes\"\n \n     conda \"bioconda::bedtools=2.30.0\"\n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "GET_AUTOSOMES",
+      "description": "Add container directive: 'I'm sorry for any confusion, but without the actual script or specific tools used in this Nextflow process, I cannot provide a suitable Docker image that covers all of them. Could you please share more information about the tools used and how they are utilized within the script? This would help me give you a better answer.'",
+      "unified_diff": "--- GET_AUTOSOMES (original)\n+++ GET_AUTOSOMES (fixed)\n@@ -543,6 +543,7 @@\n \n // === FILE: modules/local/get_autosomes.nf ===\n process GET_AUTOSOMES {\n+    container 'I'm sorry for any confusion, but without the actual script or specific tools used in this Nextflow process, I cannot provide a suitable Docker image that covers all of them. Could you please share more information about the tools used and how they are utilized within the script? This would help me give you a better answer.'\n     tag \"$fai\"\n \n     conda \"conda-forge::python=3.8.3\"\n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "GTF2BED",
+      "description": "Add container directive: 'I'm sorry for any confusion, but the information you provided is not sufficient to identify a suitable Docker image for your GTF2BED process. The script block from your question isn't available either. Please provide more details about what tools are used in this script and their versions so I can suggest an appropriate Docker image based on these details.'",
+      "unified_diff": "--- GTF2BED (original)\n+++ GTF2BED (fixed)\n@@ -576,6 +576,7 @@\n \n // === FILE: modules/local/gtf2bed.nf ===\n process GTF2BED {\n+    container 'I'm sorry for any confusion, but the information you provided is not sufficient to identify a suitable Docker image for your GTF2BED process. The script block from your question isn't available either. Please provide more details about what tools are used in this script and their versions so I can suggest an appropriate Docker image based on these details.'\n     tag \"$gtf\"\n     label 'process_low'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "IGV",
+      "description": "Add container directive: 'I'm sorry for any confusion but without the actual script block or more details about the tools used in this process, it's impossible to provide a specific Docker image that would cover all of them. However, if you have a look at IGV's official website (https://software.broadinstitute.org/software/igv/) and its GitHub page (https://github.com/IGVF/IGV), it seems like there are dependencies not covered by any Docker image.\n\nIn general, when using Nextflow together with IGV, you would have to include a custom script block to ensure that all the tools required for IGV's workflow are installed and available in the container beforehand. You can then use the \"container\" directive to indicate which Docker image should be used to execute this process.'",
+      "unified_diff": "--- IGV (original)\n+++ IGV (fixed)\n@@ -610,6 +610,7 @@\n \n // === FILE: modules/local/igv.nf ===\n process IGV {\n+    container 'I'm sorry for any confusion but without the actual script block or more details about the tools used in this process, it's impossible to provide a specific Docker image that would cover all of them. However, if you have a look at IGV's official website (https://software.broadinstitute.org/software/igv/) and its GitHub page (https://github.com/IGVF/IGV), it seems like there are dependencies not covered by any Docker image.\n\nIn general, when using Nextflow together with IGV, you would have to include a custom script block to ensure that all the tools required for IGV's workflow are installed and available in the container beforehand. You can then use the \"container\" directive to indicate which Docker image should be used to execute this process.'\n \n     conda \"conda-forge::python=3.8.3\"\n     container \"${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?\n",
+      "validation_passed": false,
+      "validation_output": "Container directive present but value mismatch: expected 'I'm sorry for any confusion but without the actual script block or more details about the tools used in this process, it's impossible to provide a specific Docker image that would cover all of them. However, if you have a look at IGV's official website (https://software.broadinstitute.org/software/igv/) and its GitHub page (https://github.com/IGVF/IGV), it seems like there are dependencies not covered by any Docker image.\n\nIn general, when using Nextflow together with IGV, you would have to include a custom script block to ensure that all the tools required for IGV's workflow are installed and available in the container beforehand. You can then use the \"container\" directive to indicate which Docker image should be used to execute this process.', got 'None'.",
+      "confidence": 0.4,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "MACS3_CONSENSUS",
+      "description": "Add container directive: 'It appears there may be some confusion as I don't have the information about this specific Nextflow process, but here are a few Docker images that are commonly used in bioinformatics workflows:\n\n1. `biocontainers/macs3`: This is for MACS3. It has all tools needed to run it and they're well-maintained by the Bioconductor team. \n\n   ```bash\n   quay.io/biocontainers/macs3:2.1.1--h9ce7805_1\n   ```\n\nPlease replace `2.1.1` with your desired version.\n\nNote: Always remember to verify the Docker image from a trusted source and understand what it does before running it on your system. It is always best practice to use specific versions of tools in bioinformatics pipelines.'",
+      "unified_diff": "--- MACS3_CONSENSUS (original)\n+++ MACS3_CONSENSUS (fixed)\n@@ -665,6 +665,7 @@\n \n // === FILE: modules/local/macs3_consensus.nf ===\n process MACS3_CONSENSUS {\n+    container 'It appears there may be some confusion as I don't have the information about this specific Nextflow process, but here are a few Docker images that are commonly used in bioinformatics workflows:\n\n1. `biocontainers/macs3`: This is for MACS3. It has all tools needed to run it and they're well-maintained by the Bioconductor team. \n\n   ```bash\n   quay.io/biocontainers/macs3:2.1.1--h9ce7805_1\n   ```\n\nPlease replace `2.1.1` with your desired version.\n\nNote: Always remember to verify the Docker image from a trusted source and understand what it does before running it on your system. It is always best practice to use specific versions of tools in bioinformatics pipelines.'\n     tag \"$meta.id\"\n     label 'process_long'\n \n",
+      "validation_passed": false,
+      "validation_output": "Container directive present but value mismatch: expected 'It appears there may be some confusion as I don't have the information about this specific Nextflow process, but here are a few Docker images that are commonly used in bioinformatics workflows:\n\n1. `biocontainers/macs3`: This is for MACS3. It has all tools needed to run it and they're well-maintained by the Bioconductor team. \n\n   ```bash\n   quay.io/biocontainers/macs3:2.1.1--h9ce7805_1\n   ```\n\nPlease replace `2.1.1` with your desired version.\n\nNote: Always remember to verify the Docker image from a trusted source and understand what it does before running it on your system. It is always best practice to use specific versions of tools in bioinformatics pipelines.', got 'None'.",
+      "confidence": 0.4,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "MULTIQC",
+      "description": "Add container directive: 'quay.io/biocontainers/multiqc:1.8---0'",
+      "unified_diff": "--- MULTIQC (original)\n+++ MULTIQC (fixed)\n@@ -724,6 +724,7 @@\n \n // === FILE: modules/local/multiqc.nf ===\n process MULTIQC {\n+    container 'quay.io/biocontainers/multiqc:1.8---0'\n     label 'process_medium'\n \n     conda 'bioconda::multiqc=1.13'\n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "MULTIQC_CUSTOM_PEAKS",
+      "description": "Add container directive: 'I'm sorry for any confusion, but there seems to be no specific Docker image that contains all the tools mentioned in your script - Sed and WC from GNU coreutils (which are available by default on most Linux distributions), as well as Cat. If these commands were run within a container that had these utilities pre-installed, they wouldn't necessarily require any special version of Docker image to be pinned down.\n\nHowever, if you specifically need the versions mentioned in your script (GNU Sed 4.7 or later and BSD/GNU Coreutils 8.30 or later), I would suggest checking out the following Biocontainers images:\n\n- quay.io/biocontainers/gnu-make:4.2.1--hdfd78af_5\n- quay.io/biocontainers/coreutils:8.30--ha9ed4bb_0\n\nPlease replace the version numbers with the ones that suit your needs, and ensure to comply with any licensing restrictions before using these images in a production setting.'",
+      "unified_diff": "--- MULTIQC_CUSTOM_PEAKS (original)\n+++ MULTIQC_CUSTOM_PEAKS (fixed)\n@@ -820,6 +820,7 @@\n \n // === FILE: modules/local/multiqc_custom_peaks.nf ===\n process MULTIQC_CUSTOM_PEAKS {\n+    container 'I'm sorry for any confusion, but there seems to be no specific Docker image that contains all the tools mentioned in your script - Sed and WC from GNU coreutils (which are available by default on most Linux distributions), as well as Cat. If these commands were run within a container that had these utilities pre-installed, they wouldn't necessarily require any special version of Docker image to be pinned down.\n\nHowever, if you specifically need the versions mentioned in your script (GNU Sed 4.7 or later and BSD/GNU Coreutils 8.30 or later), I would suggest checking out the following Biocontainers images:\n\n- quay.io/biocontainers/gnu-make:4.2.1--hdfd78af_5\n- quay.io/biocontainers/coreutils:8.30--ha9ed4bb_0\n\nPlease replace the version numbers with the ones that suit your needs, and ensure to comply with any licensing restrictions before using these images in a production setting.'\n     tag \"$meta.id\"\n \n     conda \"conda-forge::sed=4.7\"\n",
+      "validation_passed": false,
+      "validation_output": "Container directive present but value mismatch: expected 'I'm sorry for any confusion, but there seems to be no specific Docker image that contains all the tools mentioned in your script - Sed and WC from GNU coreutils (which are available by default on most Linux distributions), as well as Cat. If these commands were run within a container that had these utilities pre-installed, they wouldn't necessarily require any special version of Docker image to be pinned down.\n\nHowever, if you specifically need the versions mentioned in your script (GNU Sed 4.7 or later and BSD/GNU Coreutils 8.30 or later), I would suggest checking out the following Biocontainers images:\n\n- quay.io/biocontainers/gnu-make:4.2.1--hdfd78af_5\n- quay.io/biocontainers/coreutils:8.30--ha9ed4bb_0\n\nPlease replace the version numbers with the ones that suit your needs, and ensure to comply with any licensing restrictions before using these images in a production setting.', got 'None'.",
+      "confidence": 0.4,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "PLOT_HOMER_ANNOTATEPEAKS",
+      "description": "Add container directive: 'I'm sorry for any confusion, but the information you provided is incomplete or not sufficient to provide a suitable Docker image recommendation. I need more specific details about the tools used in this script to pin it to an appropriate Docker container. Could you please provide additional context or clarify what tools are being used?'",
+      "unified_diff": "--- PLOT_HOMER_ANNOTATEPEAKS (original)\n+++ PLOT_HOMER_ANNOTATEPEAKS (fixed)\n@@ -868,6 +868,7 @@\n \n // === FILE: modules/local/plot_homer_annotatepeaks.nf ===\n process PLOT_HOMER_ANNOTATEPEAKS {\n+    container 'I'm sorry for any confusion, but the information you provided is incomplete or not sufficient to provide a suitable Docker image recommendation. I need more specific details about the tools used in this script to pin it to an appropriate Docker container. Could you please provide additional context or clarify what tools are being used?'\n     label 'process_medium'\n \n     conda \"conda-forge::r-base=4.0.3 conda-forge::r-reshape2=1.4.4 conda-forge::r-optparse=1.6.6 conda-forge::r-ggplot2=3.3.3 conda-forge::r-scales=1.1.1 conda-forge::r-viridis=0.5.1 conda-forge::r-tidyverse=1.3.0 bioconda::bioconductor-biostrings=2.58.0 bioconda::bioconductor-complexheatmap=2.6.2\"\n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "PLOT_MACS3_QC",
+      "description": "Add container directive: 'I'm sorry for any confusion, but I cannot provide the image name and tag because the script block is not available in your request. However, based on typical usage of tools used in bioinformatics workflows (like BWA, SAMtools, bedtools, macs3), here are some possibilities:\n\n1. For BWA and SAMtools: `bioconductor/bioconductor_docker:devel`\n2. For Bedtools: `quay.io/biocontainers/bedtools:2.29.2--hdfd78af_0`\n3. For MACS3 (I can't find a specific image for this, but you might consider using the bioinformaticsplc/macs3 Docker image): `bioinformaticsplc/macs3:3.1.2-6`\n\nRemember to replace `<image>` and `<tag>` with your desired image name and tag. Also, these are just suggestions based on typical usage of tools in bioinformatics workflows. The best tool for a specific task may be different, so it's important to use the correct one in each step of your process when working with Nextflow.'",
+      "unified_diff": "--- PLOT_MACS3_QC (original)\n+++ PLOT_MACS3_QC (fixed)\n@@ -911,6 +911,7 @@\n \n // === FILE: modules/local/plot_macs3_qc.nf ===\n process PLOT_MACS3_QC {\n+    container 'I'm sorry for any confusion, but I cannot provide the image name and tag because the script block is not available in your request. However, based on typical usage of tools used in bioinformatics workflows (like BWA, SAMtools, bedtools, macs3), here are some possibilities:\n\n1. For BWA and SAMtools: `bioconductor/bioconductor_docker:devel`\n2. For Bedtools: `quay.io/biocontainers/bedtools:2.29.2--hdfd78af_0`\n3. For MACS3 (I can't find a specific image for this, but you might consider using the bioinformaticsplc/macs3 Docker image): `bioinformaticsplc/macs3:3.1.2-6`\n\nRemember to replace `<image>` and `<tag>` with your desired image name and tag. Also, these are just suggestions based on typical usage of tools in bioinformatics workflows. The best tool for a specific task may be different, so it's important to use the correct one in each step of your process when working with Nextflow.'\n     label 'process_medium'\n \n     conda \"conda-forge::r-base=4.0.3 conda-forge::r-reshape2=1.4.4 conda-forge::r-optparse=1.6.6 conda-forge::r-ggplot2=3.3.3 conda-forge::r-scales=1.1.1 conda-forge::r-viridis=0.5.1 conda-forge::r-tidyverse=1.3.0 bioconda::bioconductor-biostrings=2.58.0 bioconda::bioconductor-complexheatmap=2.6.2\"\n",
+      "validation_passed": false,
+      "validation_output": "Container directive present but value mismatch: expected 'I'm sorry for any confusion, but I cannot provide the image name and tag because the script block is not available in your request. However, based on typical usage of tools used in bioinformatics workflows (like BWA, SAMtools, bedtools, macs3), here are some possibilities:\n\n1. For BWA and SAMtools: `bioconductor/bioconductor_docker:devel`\n2. For Bedtools: `quay.io/biocontainers/bedtools:2.29.2--hdfd78af_0`\n3. For MACS3 (I can't find a specific image for this, but you might consider using the bioinformaticsplc/macs3 Docker image): `bioinformaticsplc/macs3:3.1.2-6`\n\nRemember to replace `<image>` and `<tag>` with your desired image name and tag. Also, these are just suggestions based on typical usage of tools in bioinformatics workflows. The best tool for a specific task may be different, so it's important to use the correct one in each step of your process when working with Nextflow.', got 'None'.",
+      "confidence": 0.4,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "SAMPLESHEET_CHECK",
+      "description": "Add container directive: 'I'm sorry for any confusion, but as an AI model developed by Deepseek, I don't have access to the script block or the specific details about tools used in this process. Therefore, I can't suggest a suitable Docker image without these details. Please provide more information if possible.'",
+      "unified_diff": "--- SAMPLESHEET_CHECK (original)\n+++ SAMPLESHEET_CHECK (fixed)\n@@ -949,6 +949,7 @@\n \n // === FILE: modules/local/samplesheet_check.nf ===\n process SAMPLESHEET_CHECK {\n+    container 'I'm sorry for any confusion, but as an AI model developed by Deepseek, I don't have access to the script block or the specific details about tools used in this process. Therefore, I can't suggest a suitable Docker image without these details. Please provide more information if possible.'\n     tag \"$samplesheet\"\n     label 'process_single'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "STAR_ALIGN",
+      "description": "Add container directive: 'quay.io/biocontainers/star:2.7.3a--he46f814_0'",
+      "unified_diff": "--- STAR_ALIGN (original)\n+++ STAR_ALIGN (fixed)\n@@ -984,6 +984,7 @@\n \n // === FILE: modules/local/star_align.nf ===\n process STAR_ALIGN {\n+    container 'quay.io/biocontainers/star:2.7.3a--he46f814_0'\n     tag \"$meta.id\"\n     label 'process_high'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "STAR_GENOMEGENERATE",
+      "description": "Add container directive: 'quay.io/biocontainers/star:2.7.3a--he47f11e_1'",
+      "unified_diff": "--- STAR_GENOMEGENERATE (original)\n+++ STAR_GENOMEGENERATE (fixed)\n@@ -1048,6 +1048,7 @@\n \n // === FILE: modules/local/star_genomegenerate.nf ===\n process STAR_GENOMEGENERATE {\n+    container 'quay.io/biocontainers/star:2.7.3a--he47f11e_1'\n     tag \"$fasta\"\n     label 'process_high'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "TSS_EXTRACT",
+      "description": "Add container directive: 'I'm sorry for any confusion, but the script you provided does not use any external tools like awk or sed that would typically be in a Docker container. It uses shell built-in commands of bash itself which are available in all Unix systems by default. As such, there is no need to pin this process to a specific Docker image because these tools come pre-installed on virtually every Linux distribution.\n\nThe script also does not use any bioinformatics tool, so it could be used with different Docker images as long as the base OS supports bash and awk commands. The best possible approach would be using a minimal Ubuntu or Alpine image. \n\nHowever, if you still want to pin this process to a specific Docker image, you can use any Unix-based system (like Debian/Ubuntu) because those are also available as Docker images and they have bash and awk preinstalled. The container would look like quay.io/biocontainers/ubuntu:18.04 or alpine:latest for example. \n\nBut again, I'd recommend against it unless you absolutely need these specific versions of the tools to be available in your Docker image and can live with potential issues associated with them.'",
+      "unified_diff": "--- TSS_EXTRACT (original)\n+++ TSS_EXTRACT (fixed)\n@@ -1112,6 +1112,7 @@\n \n // === FILE: modules/local/tss_extract.nf ===\n process TSS_EXTRACT {\n+    container 'I'm sorry for any confusion, but the script you provided does not use any external tools like awk or sed that would typically be in a Docker container. It uses shell built-in commands of bash itself which are available in all Unix systems by default. As such, there is no need to pin this process to a specific Docker image because these tools come pre-installed on virtually every Linux distribution.\n\nThe script also does not use any bioinformatics tool, so it could be used with different Docker images as long as the base OS supports bash and awk commands. The best possible approach would be using a minimal Ubuntu or Alpine image. \n\nHowever, if you still want to pin this process to a specific Docker image, you can use any Unix-based system (like Debian/Ubuntu) because those are also available as Docker images and they have bash and awk preinstalled. The container would look like quay.io/biocontainers/ubuntu:18.04 or alpine:latest for example. \n\nBut again, I'd recommend against it unless you absolutely need these specific versions of the tools to be available in your Docker image and can live with potential issues associated with them.'\n \n     conda \"conda-forge::sed=4.7\"\n     container \"${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?\n",
+      "validation_passed": false,
+      "validation_output": "Container directive present but value mismatch: expected 'I'm sorry for any confusion, but the script you provided does not use any external tools like awk or sed that would typically be in a Docker container. It uses shell built-in commands of bash itself which are available in all Unix systems by default. As such, there is no need to pin this process to a specific Docker image because these tools come pre-installed on virtually every Linux distribution.\n\nThe script also does not use any bioinformatics tool, so it could be used with different Docker images as long as the base OS supports bash and awk commands. The best possible approach would be using a minimal Ubuntu or Alpine image. \n\nHowever, if you still want to pin this process to a specific Docker image, you can use any Unix-based system (like Debian/Ubuntu) because those are also available as Docker images and they have bash and awk preinstalled. The container would look like quay.io/biocontainers/ubuntu:18.04 or alpine:latest for example. \n\nBut again, I'd recommend against it unless you absolutely need these specific versions of the tools to be available in your Docker image and can live with potential issues associated with them.', got 'None'.",
+      "confidence": 0.4,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "ATAQV_ATAQV",
+      "description": "Add container directive: 'I'm sorry for any confusion, but there seems to be no information provided about the tools used in this script. As a result, I can't provide you with an appropriate Docker image. If anyone could give more details on which tools are being used and what version of them they require, I would be able to help you better.'",
+      "unified_diff": "--- ATAQV_ATAQV (original)\n+++ ATAQV_ATAQV (fixed)\n@@ -1142,6 +1142,7 @@\n \n // === FILE: modules/nf-core/ataqv/ataqv/main.nf ===\n process ATAQV_ATAQV {\n+    container 'I'm sorry for any confusion, but there seems to be no information provided about the tools used in this script. As a result, I can't provide you with an appropriate Docker image. If anyone could give more details on which tools are being used and what version of them they require, I would be able to help you better.'\n     tag \"$meta.id\"\n     label 'process_medium'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "ATAQV_MKARV",
+      "description": "Add container directive: 'I'm sorry for any confusion, but there doesn't seem to be a single publicly available Docker image that can cover all tools used in your script without the use of multiple other images. The \"mkarv\" and \"ataqv\" are command-line utilities that likely come bundled with specific bioinformatics toolkits or distributions (e.g., Bioconda, Conda Forge).\n\nIf you provide more information about what tools are used in this script, I might be able to help better suggest a Docker image. \n\nPlease note that it's generally recommended to pin your container versions to specific versions rather than using :latest as :latest can introduce unpredictable behavior and potential breaking changes with each new version.'",
+      "unified_diff": "--- ATAQV_MKARV (original)\n+++ ATAQV_MKARV (fixed)\n@@ -1198,6 +1198,7 @@\n \n // === FILE: modules/nf-core/ataqv/mkarv/main.nf ===\n process ATAQV_MKARV {\n+    container 'I'm sorry for any confusion, but there doesn't seem to be a single publicly available Docker image that can cover all tools used in your script without the use of multiple other images. The \"mkarv\" and \"ataqv\" are command-line utilities that likely come bundled with specific bioinformatics toolkits or distributions (e.g., Bioconda, Conda Forge).\n\nIf you provide more information about what tools are used in this script, I might be able to help better suggest a Docker image. \n\nPlease note that it's generally recommended to pin your container versions to specific versions rather than using :latest as :latest can introduce unpredictable behavior and potential breaking changes with each new version.'\n     label 'process_medium'\n \n     conda 'bioconda::ataqv=1.3.1'\n",
+      "validation_passed": false,
+      "validation_output": "Container directive present but value mismatch: expected 'I'm sorry for any confusion, but there doesn't seem to be a single publicly available Docker image that can cover all tools used in your script without the use of multiple other images. The \"mkarv\" and \"ataqv\" are command-line utilities that likely come bundled with specific bioinformatics toolkits or distributions (e.g., Bioconda, Conda Forge).\n\nIf you provide more information about what tools are used in this script, I might be able to help better suggest a Docker image. \n\nPlease note that it's generally recommended to pin your container versions to specific versions rather than using :latest as :latest can introduce unpredictable behavior and potential breaking changes with each new version.', got 'None'.",
+      "confidence": 0.4,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "BOWTIE2_ALIGN",
+      "description": "LLM call failed \u2014 cannot suggest container image.",
+      "unified_diff": "",
+      "validation_passed": false,
+      "validation_output": "timed out",
+      "confidence": 0.0,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "BOWTIE2_BUILD",
+      "description": "LLM call failed \u2014 cannot suggest container image.",
+      "unified_diff": "",
+      "validation_passed": false,
+      "validation_output": "timed out",
+      "confidence": 0.0,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "BWA_INDEX",
+      "description": "Add container directive: 'quay.io/biocontainers/bwa:0.7.17--h5bf99c6_8'",
+      "unified_diff": "--- BWA_INDEX (original)\n+++ BWA_INDEX (fixed)\n@@ -1401,6 +1401,7 @@\n \n // === FILE: modules/nf-core/bwa/index/main.nf ===\n process BWA_INDEX {\n+    container 'quay.io/biocontainers/bwa:0.7.17--h5bf99c6_8'\n     tag \"$fasta\"\n     label 'process_single'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "BWA_MEM",
+      "description": "Add container directive: 'quay.io/biocontainers/bwa:0.7.12a-43 -- HDF5 1.8.18, GCC 7.3.0, Boost 1.69.0'",
+      "unified_diff": "--- BWA_MEM (original)\n+++ BWA_MEM (fixed)\n@@ -1455,6 +1455,7 @@\n \n // === FILE: modules/nf-core/bwa/mem/main.nf ===\n process BWA_MEM {\n+    container 'quay.io/biocontainers/bwa:0.7.12a-43 -- HDF5 1.8.18, GCC 7.3.0, Boost 1.69.0'\n     tag \"$meta.id\"\n     label 'process_high'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "CHROMAP_CHROMAP",
+      "description": "Add container directive: 'quay.io/biocontainers/chromap:2.1.4--r3.6.1_0'",
+      "unified_diff": "--- CHROMAP_CHROMAP (original)\n+++ CHROMAP_CHROMAP (fixed)\n@@ -1534,6 +1534,7 @@\n \n // === FILE: modules/nf-core/chromap/chromap/main.nf ===\n process CHROMAP_CHROMAP {\n+    container 'quay.io/biocontainers/chromap:2.1.4--r3.6.1_0'\n     tag \"$meta.id\"\n     label 'process_medium'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "CHROMAP_INDEX",
+      "description": "Add container directive: 'I'm sorry for any confusion but your question seems to be about Docker images and Nextflow processes, which are not directly related to bioinformatics workflows or the CHROMAP_INDEX process you mentioned. However, I can help with general Docker image questions or provide some suggestions based on common tools used in bioinformatics workflows. If that's what you meant, please clarify your question so I could assist you better.'",
+      "unified_diff": "--- CHROMAP_INDEX (original)\n+++ CHROMAP_INDEX (fixed)\n@@ -1632,6 +1632,7 @@\n \n // === FILE: modules/nf-core/chromap/index/main.nf ===\n process CHROMAP_INDEX {\n+    container 'I'm sorry for any confusion but your question seems to be about Docker images and Nextflow processes, which are not directly related to bioinformatics workflows or the CHROMAP_INDEX process you mentioned. However, I can help with general Docker image questions or provide some suggestions based on common tools used in bioinformatics workflows. If that's what you meant, please clarify your question so I could assist you better.'\n     tag \"$fasta\"\n     label 'process_medium'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "CUSTOM_GETCHROMSIZES",
+      "description": "Add container directive: 'quay.io/biocontainers/samtools:1.10--h34e2a0d_3'",
+      "unified_diff": "--- CUSTOM_GETCHROMSIZES (original)\n+++ CUSTOM_GETCHROMSIZES (fixed)\n@@ -1671,6 +1671,7 @@\n \n // === FILE: modules/nf-core/custom/getchromsizes/main.nf ===\n process CUSTOM_GETCHROMSIZES {\n+    container 'quay.io/biocontainers/samtools:1.10--h34e2a0d_3'\n     tag \"$fasta\"\n     label 'process_single'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "DEEPTOOLS_COMPUTEMATRIX",
+      "description": "Add container directive: 'quay.io/biocontainers/deeptools:3.1.2--pyhdf5e363_0'",
+      "unified_diff": "--- DEEPTOOLS_COMPUTEMATRIX (original)\n+++ DEEPTOOLS_COMPUTEMATRIX (fixed)\n@@ -1718,6 +1718,7 @@\n \n // === FILE: modules/nf-core/deeptools/computematrix/main.nf ===\n process DEEPTOOLS_COMPUTEMATRIX {\n+    container 'quay.io/biocontainers/deeptools:3.1.2--pyhdf5e363_0'\n     tag \"$meta.id\"\n     label 'process_high'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "DEEPTOOLS_PLOTFINGERPRINT",
+      "description": "LLM call failed \u2014 cannot suggest container image.",
+      "unified_diff": "",
+      "validation_passed": false,
+      "validation_output": "timed out",
+      "confidence": 0.0,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "DEEPTOOLS_PLOTHEATMAP",
+      "description": "LLM call failed \u2014 cannot suggest container image.",
+      "unified_diff": "",
+      "validation_passed": false,
+      "validation_output": "timed out",
+      "confidence": 0.0,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "DEEPTOOLS_PLOTPROFILE",
+      "description": "LLM call failed \u2014 cannot suggest container image.",
+      "unified_diff": "",
+      "validation_passed": false,
+      "validation_output": "timed out",
+      "confidence": 0.0,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "FASTQC",
+      "description": "LLM call failed \u2014 cannot suggest container image.",
+      "unified_diff": "",
+      "validation_passed": false,
+      "validation_output": "timed out",
+      "confidence": 0.0,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "GFFREAD",
+      "description": "LLM call failed \u2014 cannot suggest container image.",
+      "unified_diff": "",
+      "validation_passed": false,
+      "validation_output": "timed out",
+      "confidence": 0.0,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "GUNZIP",
+      "description": "Add container directive: 'The Docker image containing all the tools used in this script is `quay.io/biocontainers/gzip:1.12-r0` with a specific version tag, i.e., 1.12-r0.'",
+      "unified_diff": "--- GUNZIP (original)\n+++ GUNZIP (fixed)\n@@ -2034,6 +2034,7 @@\n \n // === FILE: modules/nf-core/gunzip/main.nf ===\n process GUNZIP {\n+    container 'The Docker image containing all the tools used in this script is `quay.io/biocontainers/gzip:1.12-r0` with a specific version tag, i.e., 1.12-r0.'\n     tag \"$archive\"\n     label 'process_single'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "HOMER_ANNOTATEPEAKS",
+      "description": "Add container directive: 'I'm sorry for any confusion, but the script you provided does not actually contain any Docker container directives or references to specific images used in the process. This is a common issue when using Nextflow and processes defined within scripts often don't include container definitions. \n\nTo use containers with Nextflow, you would need to define them at the top of your Nextflow script using the `container` keyword followed by the image name and tag. For example:\n\n```groovy\nprocess HOMER_ANNOTATEPEAKS {\n    container \"quay.io/biocontainers/homer:4.11--hdfd78af_0\"\n\n    // Rest of your process definition here...\n}\n```\n\nHowever, without a specific tool in mind to pin the Docker image for, this is just a hypothetical example using HOMER as it seems you're looking for something related. You would need to replace \"homer\" and version number with the exact tools used in your script. \n\nPlease provide more information or clarify what specific tool(s) you are interested in so I can give you a more accurate answer.'",
+      "unified_diff": "--- HOMER_ANNOTATEPEAKS (original)\n+++ HOMER_ANNOTATEPEAKS (fixed)\n@@ -2085,6 +2085,7 @@\n \n // === FILE: modules/nf-core/homer/annotatepeaks/main.nf ===\n process HOMER_ANNOTATEPEAKS {\n+    container 'I'm sorry for any confusion, but the script you provided does not actually contain any Docker container directives or references to specific images used in the process. This is a common issue when using Nextflow and processes defined within scripts often don't include container definitions. \n\nTo use containers with Nextflow, you would need to define them at the top of your Nextflow script using the `container` keyword followed by the image name and tag. For example:\n\n```groovy\nprocess HOMER_ANNOTATEPEAKS {\n    container \"quay.io/biocontainers/homer:4.11--hdfd78af_0\"\n\n    // Rest of your process definition here...\n}\n```\n\nHowever, without a specific tool in mind to pin the Docker image for, this is just a hypothetical example using HOMER as it seems you're looking for something related. You would need to replace \"homer\" and version number with the exact tools used in your script. \n\nPlease provide more information or clarify what specific tool(s) you are interested in so I can give you a more accurate answer.'\n     tag \"$meta.id\"\n     label 'process_medium'\n \n",
+      "validation_passed": false,
+      "validation_output": "Container directive present but value mismatch: expected 'I'm sorry for any confusion, but the script you provided does not actually contain any Docker container directives or references to specific images used in the process. This is a common issue when using Nextflow and processes defined within scripts often don't include container definitions. \n\nTo use containers with Nextflow, you would need to define them at the top of your Nextflow script using the `container` keyword followed by the image name and tag. For example:\n\n```groovy\nprocess HOMER_ANNOTATEPEAKS {\n    container \"quay.io/biocontainers/homer:4.11--hdfd78af_0\"\n\n    // Rest of your process definition here...\n}\n```\n\nHowever, without a specific tool in mind to pin the Docker image for, this is just a hypothetical example using HOMER as it seems you're looking for something related. You would need to replace \"homer\" and version number with the exact tools used in your script. \n\nPlease provide more information or clarify what specific tool(s) you are interested in so I can give you a more accurate answer.', got 'quay.io/biocontainers/homer:4.11--hdfd78af_0'.",
+      "confidence": 0.4,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "KHMER_UNIQUEKMERS",
+      "description": "Add container directive: 'The script you provided is written in Groovy, which is a statically typed language fully integrated with the Java platform and designed to be embedded into Java applications (like the ones that run on JVM). It's not directly related to any specific Docker image. \n\nHowever, if we take into account what the script does, here are some possible Docker images:\n\n1. bwa/0.7.17-r128 or similar (from Biocontainers) - used for BWA (Burrows-Wheeler Aligner).\n2. python:3.6-slim-buster - if the script uses Python as its primary language.\n3. bioconductor/bioconductor_docker:devel - if it's using R or any Bioconductor package.\n4. continuumio/anaconda3 - if it uses Conda to manage dependencies (like khmer in this case).\n\nPlease note that the actual Docker image you should use depends on what exactly are the tools and libraries used by your script, so these are just possible suggestions based on common usage patterns of bioinformatics workflows. You would need to do a bit more research or consult with someone familiar with Nextflow and the specific software tools being used in this process.'",
+      "unified_diff": "--- KHMER_UNIQUEKMERS (original)\n+++ KHMER_UNIQUEKMERS (fixed)\n@@ -2130,6 +2130,7 @@\n \n // === FILE: modules/nf-core/khmer/uniquekmers/main.nf ===\n process KHMER_UNIQUEKMERS {\n+    container 'The script you provided is written in Groovy, which is a statically typed language fully integrated with the Java platform and designed to be embedded into Java applications (like the ones that run on JVM). It's not directly related to any specific Docker image. \n\nHowever, if we take into account what the script does, here are some possible Docker images:\n\n1. bwa/0.7.17-r128 or similar (from Biocontainers) - used for BWA (Burrows-Wheeler Aligner).\n2. python:3.6-slim-buster - if the script uses Python as its primary language.\n3. bioconductor/bioconductor_docker:devel - if it's using R or any Bioconductor package.\n4. continuumio/anaconda3 - if it uses Conda to manage dependencies (like khmer in this case).\n\nPlease note that the actual Docker image you should use depends on what exactly are the tools and libraries used by your script, so these are just possible suggestions based on common usage patterns of bioinformatics workflows. You would need to do a bit more research or consult with someone familiar with Nextflow and the specific software tools being used in this process.'\n     tag \"$fasta\"\n     label 'process_low'\n \n",
+      "validation_passed": false,
+      "validation_output": "Container directive present but value mismatch: expected 'The script you provided is written in Groovy, which is a statically typed language fully integrated with the Java platform and designed to be embedded into Java applications (like the ones that run on JVM). It's not directly related to any specific Docker image. \n\nHowever, if we take into account what the script does, here are some possible Docker images:\n\n1. bwa/0.7.17-r128 or similar (from Biocontainers) - used for BWA (Burrows-Wheeler Aligner).\n2. python:3.6-slim-buster - if the script uses Python as its primary language.\n3. bioconductor/bioconductor_docker:devel - if it's using R or any Bioconductor package.\n4. continuumio/anaconda3 - if it uses Conda to manage dependencies (like khmer in this case).\n\nPlease note that the actual Docker image you should use depends on what exactly are the tools and libraries used by your script, so these are just possible suggestions based on common usage patterns of bioinformatics workflows. You would need to do a bit more research or consult with someone familiar with Nextflow and the specific software tools being used in this process.', got 'None'.",
+      "confidence": 0.4,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "MACS3_CALLPEAK",
+      "description": "Add container directive: 'I'm sorry, but as an AI model developed by Deepseek, I can't provide specific images or their versions because it depends on the current state of available tools and Docker images. You need to find a suitable image that contains all necessary tools for this Nextflow process such as MACS3. Please check with available Biocontainers or official tool images in the Docker Hub.'",
+      "unified_diff": "--- MACS3_CALLPEAK (original)\n+++ MACS3_CALLPEAK (fixed)\n@@ -2172,6 +2172,7 @@\n // === FILE: modules/nf-core/macs3/callpeak/main.nf ===\n \n process MACS3_CALLPEAK {\n+    container 'I'm sorry, but as an AI model developed by Deepseek, I can't provide specific images or their versions because it depends on the current state of available tools and Docker images. You need to find a suitable image that contains all necessary tools for this Nextflow process such as MACS3. Please check with available Biocontainers or official tool images in the Docker Hub.'\n     tag \"$meta.id\"\n     label 'process_medium'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "PICARD_COLLECTMULTIPLEMETRICS",
+      "description": "Add container directive: 'quay.io/biocontainers/picard:2.24.0--0'",
+      "unified_diff": "--- PICARD_COLLECTMULTIPLEMETRICS (original)\n+++ PICARD_COLLECTMULTIPLEMETRICS (fixed)\n@@ -2244,6 +2244,7 @@\n \n // === FILE: modules/nf-core/picard/collectmultiplemetrics/main.nf ===\n process PICARD_COLLECTMULTIPLEMETRICS {\n+    container 'quay.io/biocontainers/picard:2.24.0--0'\n     tag \"$meta.id\"\n     label 'process_single'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "PICARD_MARKDUPLICATES",
+      "description": "Add container directive: 'quay.io/biocontainers/picard:2.24.0--0'",
+      "unified_diff": "--- PICARD_MARKDUPLICATES (original)\n+++ PICARD_MARKDUPLICATES (fixed)\n@@ -2314,6 +2314,7 @@\n \n // === FILE: modules/nf-core/picard/markduplicates/main.nf ===\n process PICARD_MARKDUPLICATES {\n+    container 'quay.io/biocontainers/picard:2.24.0--0'\n     tag \"$meta.id\"\n     label 'process_medium'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "PICARD_MERGESAMFILES",
+      "description": "Add container directive: 'quay.io/biocontainers/picard:2.24.0--0'",
+      "unified_diff": "--- PICARD_MERGESAMFILES (original)\n+++ PICARD_MERGESAMFILES (fixed)\n@@ -2385,6 +2385,7 @@\n \n // === FILE: modules/nf-core/picard/mergesamfiles/main.nf ===\n process PICARD_MERGESAMFILES {\n+    container 'quay.io/biocontainers/picard:2.24.0--0'\n     tag \"$meta.id\"\n     label 'process_medium'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "PRESEQ_LCEXTRAP",
+      "description": "Add container directive: 'I'm sorry for any confusion, but as an AI model developed by Deepseek and trained specifically on programming-related tasks, I don't have direct access to the internet or external databases like Docker Hub. Therefore, I can't provide specific information about individual Docker images or their versions. \n\nHowever, if you know for sure that all tools (like preseq) are available in a specific version inside a single image, and this image is hosted on DockerHub, the syntax would be as follows: `image_name:version_tag`. For example, `biocontainers/preseq:2.0.3--hdfd78af_1`. \n\nPlease replace `image_name` and `version_tag` with the actual image name and version tag from DockerHub for your specific use case. Remember to always check the official documentation or verify the availability of newer versions before using them in production environments.'",
+      "unified_diff": "--- PRESEQ_LCEXTRAP (original)\n+++ PRESEQ_LCEXTRAP (fixed)\n@@ -2450,6 +2450,7 @@\n \n // === FILE: modules/nf-core/preseq/lcextrap/main.nf ===\n process PRESEQ_LCEXTRAP {\n+    container 'I'm sorry for any confusion, but as an AI model developed by Deepseek and trained specifically on programming-related tasks, I don't have direct access to the internet or external databases like Docker Hub. Therefore, I can't provide specific information about individual Docker images or their versions. \n\nHowever, if you know for sure that all tools (like preseq) are available in a specific version inside a single image, and this image is hosted on DockerHub, the syntax would be as follows: `image_name:version_tag`. For example, `biocontainers/preseq:2.0.3--hdfd78af_1`. \n\nPlease replace `image_name` and `version_tag` with the actual image name and version tag from DockerHub for your specific use case. Remember to always check the official documentation or verify the availability of newer versions before using them in production environments.'\n     tag \"$meta.id\"\n     label 'process_single'\n     label 'error_ignore'\n",
+      "validation_passed": false,
+      "validation_output": "Container directive present but value mismatch: expected 'I'm sorry for any confusion, but as an AI model developed by Deepseek and trained specifically on programming-related tasks, I don't have direct access to the internet or external databases like Docker Hub. Therefore, I can't provide specific information about individual Docker images or their versions. \n\nHowever, if you know for sure that all tools (like preseq) are available in a specific version inside a single image, and this image is hosted on DockerHub, the syntax would be as follows: `image_name:version_tag`. For example, `biocontainers/preseq:2.0.3--hdfd78af_1`. \n\nPlease replace `image_name` and `version_tag` with the actual image name and version tag from DockerHub for your specific use case. Remember to always check the official documentation or verify the availability of newer versions before using them in production environments.', got 'None'.",
+      "confidence": 0.4,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "SAMTOOLS_FLAGSTAT",
+      "description": "Add container directive: 'quay.io/biocontainers/samtools:1.14-r2--hdfd78af_0'",
+      "unified_diff": "--- SAMTOOLS_FLAGSTAT (original)\n+++ SAMTOOLS_FLAGSTAT (fixed)\n@@ -2493,6 +2493,7 @@\n \n // === FILE: modules/nf-core/samtools/flagstat/main.nf ===\n process SAMTOOLS_FLAGSTAT {\n+    container 'quay.io/biocontainers/samtools:1.14-r2--hdfd78af_0'\n     tag \"$meta.id\"\n     label 'process_single'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "SAMTOOLS_IDXSTATS",
+      "description": "Add container directive: 'quay.io/biocontainers/samtools:1.10.2--hdfd78af_3'",
+      "unified_diff": "--- SAMTOOLS_IDXSTATS (original)\n+++ SAMTOOLS_IDXSTATS (fixed)\n@@ -2542,6 +2542,7 @@\n \n // === FILE: modules/nf-core/samtools/idxstats/main.nf ===\n process SAMTOOLS_IDXSTATS {\n+    container 'quay.io/biocontainers/samtools:1.10.2--hdfd78af_3'\n     tag \"$meta.id\"\n     label 'process_single'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "SAMTOOLS_INDEX",
+      "description": "Add container directive: 'quay.io/biocontainers/samtools:1.10--hdfd78af_4'",
+      "unified_diff": "--- SAMTOOLS_INDEX (original)\n+++ SAMTOOLS_INDEX (fixed)\n@@ -2593,6 +2593,7 @@\n \n // === FILE: modules/nf-core/samtools/index/main.nf ===\n process SAMTOOLS_INDEX {\n+    container 'quay.io/biocontainers/samtools:1.10--hdfd78af_4'\n     tag \"$meta.id\"\n     label 'process_low'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "SAMTOOLS_SORT",
+      "description": "Add container directive: 'quay.io/biocontainers/sambamba:0.7.0--he3a1d4e_2'",
+      "unified_diff": "--- SAMTOOLS_SORT (original)\n+++ SAMTOOLS_SORT (fixed)\n@@ -2644,6 +2644,7 @@\n \n // === FILE: modules/nf-core/samtools/sort/main.nf ===\n process SAMTOOLS_SORT {\n+    container 'quay.io/biocontainers/sambamba:0.7.0--he3a1d4e_2'\n     tag \"$meta.id\"\n     label 'process_medium'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "SAMTOOLS_STATS",
+      "description": "Add container directive: 'quay.io/biocontainers/samtools:1.13-4'",
+      "unified_diff": "--- SAMTOOLS_STATS (original)\n+++ SAMTOOLS_STATS (fixed)\n@@ -2710,6 +2710,7 @@\n \n // === FILE: modules/nf-core/samtools/stats/main.nf ===\n process SAMTOOLS_STATS {\n+    container 'quay.io/biocontainers/samtools:1.13-4'\n     tag \"$meta.id\"\n     label 'process_single'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "SUBREAD_FEATURECOUNTS",
+      "description": "Add container directive: 'The script you've provided seems to use `featureCounts` from the subread package, which is a part of Bioconductor. \n\nA suitable Docker image that includes all required tools (including featureCounts) would be \"quay.io/biocontainers/subread:2.0.0--hdfd78af_1\". This image contains the version of `featureCounts` specified in your script, and should have all other necessary tools for a successful execution of this process. \n\nPlease note that you must specify a specific tag instead of \"latest\" to avoid potential issues related with updates or changes. The available tags can be found on Docker Hub at the above link. For instance, use something like \"2.0.0--hdfd78af_1\".'",
+      "unified_diff": "--- SUBREAD_FEATURECOUNTS (original)\n+++ SUBREAD_FEATURECOUNTS (fixed)\n@@ -2762,6 +2762,7 @@\n \n // === FILE: modules/nf-core/subread/featurecounts/main.nf ===\n process SUBREAD_FEATURECOUNTS {\n+    container 'The script you've provided seems to use `featureCounts` from the subread package, which is a part of Bioconductor. \n\nA suitable Docker image that includes all required tools (including featureCounts) would be \"quay.io/biocontainers/subread:2.0.0--hdfd78af_1\". This image contains the version of `featureCounts` specified in your script, and should have all other necessary tools for a successful execution of this process. \n\nPlease note that you must specify a specific tag instead of \"latest\" to avoid potential issues related with updates or changes. The available tags can be found on Docker Hub at the above link. For instance, use something like \"2.0.0--hdfd78af_1\".'\n     tag \"$meta.id\"\n     label 'process_medium'\n \n",
+      "validation_passed": false,
+      "validation_output": "Container directive present but value mismatch: expected 'The script you've provided seems to use `featureCounts` from the subread package, which is a part of Bioconductor. \n\nA suitable Docker image that includes all required tools (including featureCounts) would be \"quay.io/biocontainers/subread:2.0.0--hdfd78af_1\". This image contains the version of `featureCounts` specified in your script, and should have all other necessary tools for a successful execution of this process. \n\nPlease note that you must specify a specific tag instead of \"latest\" to avoid potential issues related with updates or changes. The available tags can be found on Docker Hub at the above link. For instance, use something like \"2.0.0--hdfd78af_1\".', got 'None'.",
+      "confidence": 0.4,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "TRIMGALORE",
+      "description": "Add container directive: 'The provided script uses several bioinformatics tools like TrimGalore and Cutadapt, so it's appropriate to use a container with these tools installed. A possible choice could be the Biocontainers image for Nextflow, which already has all these tools pre-installed. However, no version tag is specified because you should always use the latest stable release of an image when possible, not just the :latest tag.'",
+      "unified_diff": "--- TRIMGALORE (original)\n+++ TRIMGALORE (fixed)\n@@ -2812,6 +2812,7 @@\n \n // === FILE: modules/nf-core/trimgalore/main.nf ===\n process TRIMGALORE {\n+    container 'The provided script uses several bioinformatics tools like TrimGalore and Cutadapt, so it's appropriate to use a container with these tools installed. A possible choice could be the Biocontainers image for Nextflow, which already has all these tools pre-installed. However, no version tag is specified because you should always use the latest stable release of an image when possible, not just the :latest tag.'\n     tag \"$meta.id\"\n     label 'process_high'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "UCSC_BEDGRAPHTOBIGWIG",
+      "description": "Add container directive: 'quay.io/biocontainers/ucs-c-bedgraphtobigwig:4.45--0'",
+      "unified_diff": "--- UCSC_BEDGRAPHTOBIGWIG (original)\n+++ UCSC_BEDGRAPHTOBIGWIG (fixed)\n@@ -2890,6 +2890,7 @@\n \n // === FILE: modules/nf-core/ucsc/bedgraphtobigwig/main.nf ===\n process UCSC_BEDGRAPHTOBIGWIG {\n+    container 'quay.io/biocontainers/ucs-c-bedgraphtobigwig:4.45--0'\n     tag \"$meta.id\"\n     label 'process_single'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "UMITOOLS_EXTRACT",
+      "description": "Add container directive: 'quay.io/biocontainers/umi-tools:1.4.1--py37hdfd78af_0'",
+      "unified_diff": "--- UMITOOLS_EXTRACT (original)\n+++ UMITOOLS_EXTRACT (fixed)\n@@ -2942,6 +2942,7 @@\n \n // === FILE: modules/nf-core/umitools/extract/main.nf ===\n process UMITOOLS_EXTRACT {\n+    container 'quay.io/biocontainers/umi-tools:1.4.1--py37hdfd78af_0'\n     tag \"$meta.id\"\n     label \"process_single\"\n     label \"process_long\"\n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "UNTAR",
+      "description": "Add container directive: '`quay.io/biocontainers/tar:2.4.2n--hee30fd6_1`'",
+      "unified_diff": "--- UNTAR (original)\n+++ UNTAR (fixed)\n@@ -3001,6 +3001,7 @@\n \n // === FILE: modules/nf-core/untar/main.nf ===\n process UNTAR {\n+    container '`quay.io/biocontainers/tar:2.4.2n--hee30fd6_1`'\n     tag \"$archive\"\n     label 'process_single'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    }
+  ],
+  "summary": {
+    "total_proposals": 51,
+    "validated": 33,
+    "human_review_required": 18,
+    "avg_confidence": 0.64
+  }
+}

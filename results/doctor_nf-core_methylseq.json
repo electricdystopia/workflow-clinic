@@ -1,0 +1,74 @@
+{
+  "schema_version": "0.1.0",
+  "generated_at": "2026-03-25T05:10:43.431868+00:00",
+  "workflow_path": "main.nf",
+  "source": "dockstore:github.com/nf-core/methylseq",
+  "proposals": [
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "BISMARK_GENOMEPREPARATION",
+      "description": "Add container directive: 'quay.io/biocontainers/bismark:0.23.1--py38hdfd78af_0'",
+      "unified_diff": "--- BISMARK_GENOMEPREPARATION (original)\n+++ BISMARK_GENOMEPREPARATION (fixed)\n@@ -148,6 +148,7 @@\n \n // === FILE: modules/nf-core/bismark/genomepreparation/main.nf ===\n process BISMARK_GENOMEPREPARATION {\n+    container 'quay.io/biocontainers/bismark:0.23.1--py38hdfd78af_0'\n     tag \"$fasta\"\n     label 'process_high'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "BWA_INDEX",
+      "description": "Add container directive: 'quay.io/biocontainers/bwa:0.7.12a-342'",
+      "unified_diff": "--- BWA_INDEX (original)\n+++ BWA_INDEX (fixed)\n@@ -212,6 +212,7 @@\n \n // === FILE: modules/nf-core/bwa/index/main.nf ===\n process BWA_INDEX {\n+    container 'quay.io/biocontainers/bwa:0.7.12a-342'\n     tag \"$fasta\"\n     // NOTE requires 5.37N memory where N is the size of the database\n     // source: https://bio-bwa.sourceforge.net/bwa.shtml#8\n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "BWAMETH_INDEX",
+      "description": "Add container directive: 'quay.io/biocontainers/bwameth:0.24-r0'",
+      "unified_diff": "--- BWAMETH_INDEX (original)\n+++ BWAMETH_INDEX (fixed)\n@@ -270,6 +270,7 @@\n \n // === FILE: modules/nf-core/bwameth/index/main.nf ===\n process BWAMETH_INDEX {\n+    container 'quay.io/biocontainers/bwameth:0.24-r0'\n     tag \"$fasta\"\n     label 'process_high'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "GUNZIP",
+      "description": "Add container directive: 'The script uses gzip from GNU coreutils package, which is available in the Alpine Linux-based container images like alpine:3.12 or debian:stretch. The image name and tag would be something like this: \n\n`alpine:3.12` or `debian:stretch`'",
+      "unified_diff": "--- GUNZIP (original)\n+++ GUNZIP (fixed)\n@@ -328,6 +328,7 @@\n \n // === FILE: modules/nf-core/gunzip/main.nf ===\n process GUNZIP {\n+    container 'The script uses gzip from GNU coreutils package, which is available in the Alpine Linux-based container images like alpine:3.12 or debian:stretch. The image name and tag would be something like this: \n\n`alpine:3.12` or `debian:stretch`'\n     tag \"${archive}\"\n     label 'process_single'\n \n",
+      "validation_passed": false,
+      "validation_output": "Container directive present but value mismatch: expected 'The script uses gzip from GNU coreutils package, which is available in the Alpine Linux-based container images like alpine:3.12 or debian:stretch. The image name and tag would be something like this: \n\n`alpine:3.12` or `debian:stretch`', got 'None'.",
+      "confidence": 0.4,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "SAMTOOLS_FAIDX",
+      "description": "Add container directive: 'The script uses samtools for indexing and sequence data manipulation. The official Docker image for the latest version of Samtools is sequencing/samtools at version 1.12-r0 which you can use in a container directive like this:\n\n```bash\nprocess SAMTOOLS_FAIDX {\n    container \"docker://quay.io/biocontainers/samtools:1.12-r0\"\n\n    ... // the rest of your process definition goes here\n}\n```'",
+      "unified_diff": "--- SAMTOOLS_FAIDX (original)\n+++ SAMTOOLS_FAIDX (fixed)\n@@ -386,6 +386,7 @@\n \n // === FILE: modules/nf-core/samtools/faidx/main.nf ===\n process SAMTOOLS_FAIDX {\n+    container 'The script uses samtools for indexing and sequence data manipulation. The official Docker image for the latest version of Samtools is sequencing/samtools at version 1.12-r0 which you can use in a container directive like this:\n\n```bash\nprocess SAMTOOLS_FAIDX {\n    container \"docker://quay.io/biocontainers/samtools:1.12-r0\"\n\n    ... // the rest of your process definition goes here\n}\n```'\n     tag \"$fasta\"\n     label 'process_single'\n \n",
+      "validation_passed": false,
+      "validation_output": "Container directive present but value mismatch: expected 'The script uses samtools for indexing and sequence data manipulation. The official Docker image for the latest version of Samtools is sequencing/samtools at version 1.12-r0 which you can use in a container directive like this:\n\n```bash\nprocess SAMTOOLS_FAIDX {\n    container \"docker://quay.io/biocontainers/samtools:1.12-r0\"\n\n    ... // the rest of your process definition goes here\n}\n```', got 'docker://quay.io/biocontainers/samtools:1.12-r0'.",
+      "confidence": 0.4,
+      "human_review_required": true
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "UNTAR",
+      "description": "Add container directive: 'quay.io/biocontainers/tar:2.4.23-1--hea49e5d_1'",
+      "unified_diff": "--- UNTAR (original)\n+++ UNTAR (fixed)\n@@ -450,6 +450,7 @@\n \n // === FILE: modules/nf-core/untar/main.nf ===\n process UNTAR {\n+    container 'quay.io/biocontainers/tar:2.4.23-1--hea49e5d_1'\n     tag \"${archive}\"\n     label 'process_single'\n \n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    }
+  ],
+  "summary": {
+    "total_proposals": 6,
+    "validated": 4,
+    "human_review_required": 2,
+    "avg_confidence": 0.7
+  }
+}

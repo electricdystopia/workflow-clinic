@@ -1,0 +1,24 @@
+{
+  "schema_version": "0.1.0",
+  "generated_at": "2026-03-25T06:58:58.218630+00:00",
+  "workflow_path": "main.nf",
+  "source": "dockstore:github.com/erinyoung/roundabout",
+  "proposals": [
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "circos",
+      "description": "Add container directive: 'quay.io/biocontainers/circos:v0.69-34--hed695b0_2'",
+      "unified_diff": "--- circos (original)\n+++ circos (fixed)\n@@ -159,6 +159,7 @@\n \n // === FILE: modules/circos.nf ===\n process circos {\n+    container 'quay.io/biocontainers/circos:v0.69-34--hed695b0_2'\n     tag \"${sample}\"\n     container = 'quay.io/biocontainers/circos:0.69.8--hdfd78af_1'\n     publishDir params.outdir, mode: 'copy'\n",
+      "validation_passed": true,
+      "validation_output": "Parser confirmed container directive is present.",
+      "confidence": 0.85,
+      "human_review_required": false
+    }
+  ],
+  "summary": {
+    "total_proposals": 1,
+    "validated": 1,
+    "human_review_required": 0,
+    "avg_confidence": 0.85
+  }
+}

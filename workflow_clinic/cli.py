@@ -18,6 +18,11 @@ from workflow_clinic.critic.engine import CriticEngine
 from workflow_clinic.parsers.nextflow import NextflowParser
 from workflow_clinic.schema.gap_report import GapReport, Severity
 
+from workflow_clinic.doctor.engine import DoctorEngine
+from workflow_clinic.doctor.fix_generators.base import FixProposal
+
+import dataclasses
+
 app = typer.Typer(
     help="Workflow Clinic — cloud-readiness tools for bioinformatics workflows.",
     no_args_is_help=True,
@@ -311,3 +316,110 @@ def _render_markdown(report: GapReport) -> str:
         lines.append("---\n")
 
     return "\n".join(lines)
+
+@app.command("doctor")
+def doctor(
+    path: Path = typer.Argument(..., help="Path to a .nf workflow file"),
+    gap: str | None = typer.Option(
+        None,
+        "--gap", "-g",
+        help="Only fix gaps with this ID, e.g. CONTAINER-001.",
+    ),
+    output: Path | None = typer.Option(
+        None,
+        "--output", "-o",
+        help="Save fix proposals as JSON to this file.",
+    ),
+) -> None:
+    """Generate fixes for auto-fixable gaps in a Nextflow workflow."""
+    if not path.exists():
+        err_console.print(f"[red]File not found:[/red] {path}")
+        raise typer.Exit(1)
+ 
+    source       = path.read_text(encoding="utf-8")
+    source_lines = source.splitlines(keepends=True)
+    workflow     = NextflowParser().parse_file(path)
+    report       = CriticEngine().run(workflow)
+ 
+    # filter to requested gap_id if provided
+    if gap:
+        filtered_gaps = [g for g in report.gaps if g.gap_id == gap]
+        if not filtered_gaps:
+            console.print(f"[yellow]No gaps with ID '{gap}' found in report.[/yellow]")
+            raise typer.Exit(0)
+        report = report.model_copy(update={"gaps": filtered_gaps})
+ 
+    auto_fixable = [g for g in report.gaps if g.auto_fixable]
+    if not auto_fixable:
+        console.print("[yellow]No auto-fixable gaps found.[/yellow]")
+        raise typer.Exit(0)
+ 
+    console.print(f"\n[bold cyan]Workflow Doctor[/bold cyan] — {path}")
+    console.print(f"[dim]Auto-fixable gaps: {len(auto_fixable)}[/dim]\n")
+ 
+    proposals = DoctorEngine().run(report, source_lines)
+ 
+    if not proposals:
+        console.print("[yellow]No fixes could be generated.[/yellow]")
+        raise typer.Exit(0)
+ 
+    # ── Save to file if --output given ────────────────────────────────────────
+    if output:
+        rendered = _render_doctor_json(proposals, path)
+        output.write_text(rendered, encoding="utf-8")
+        console.print(f"[dim]Fix proposals saved to {output}[/dim]\n")
+ 
+    # ── Always print to terminal ──────────────────────────────────────────────
+    for proposal in proposals:
+        colour = "green" if proposal.validation_passed else "yellow"
+        console.rule(
+            f"[bold]{proposal.gap_id}[/bold] — [cyan]{proposal.process_name}[/cyan]"
+        )
+        console.print(f"[bold]Fix:[/bold]        {proposal.description}")
+        console.print(
+            f"[bold]Confidence:[/bold] [{colour}]{proposal.confidence:.0%}[/{colour}]"
+        )
+        console.print(
+            f"[bold]Validated:[/bold]  "
+            f"{'[green]✓[/green]' if proposal.validation_passed else '[red]✗[/red]'} "
+            f"{proposal.validation_output}"
+        )
+        if proposal.human_review_required:
+            console.print("[yellow]⚠ Human review required before applying.[/yellow]")
+        if proposal.unified_diff:
+            console.print("\n[bold]Diff:[/bold]")
+            for line in proposal.unified_diff.splitlines():
+                if line.startswith("+") and not line.startswith("+++"):
+                    console.print(f"[green]{line}[/green]")
+                elif line.startswith("-") and not line.startswith("---"):
+                    console.print(f"[red]{line}[/red]")
+                else:
+                    console.print(line)
+        console.print()
+ 
+ 
+def _serialize_proposals(proposals: list[FixProposal]) -> list[dict]:
+    """Convert a list of FixProposal dataclasses to JSON-safe dicts."""
+    import dataclasses
+    return [dataclasses.asdict(p) for p in proposals]
+ 
+ 
+def _render_doctor_json(proposals: list[FixProposal], workflow_path: Path) -> str:
+    """Serialise fix proposals to a JSON string matching the gap report style."""
+    from datetime import datetime, timezone
+    doc = {
+        "schema_version": "0.1.0",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "workflow_path": str(workflow_path),
+        "proposals": _serialize_proposals(proposals),
+        "summary": {
+            "total_proposals": len(proposals),
+            "validated": sum(1 for p in proposals if p.validation_passed),
+            "human_review_required": sum(1 for p in proposals if p.human_review_required),
+            "avg_confidence": round(
+                sum(p.confidence for p in proposals) / len(proposals), 2
+            ) if proposals else 0.0,
+        },
+    }
+    return json.dumps(doc, indent=2)
+ 
