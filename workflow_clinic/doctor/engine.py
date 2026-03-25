@@ -6,7 +6,7 @@ and returns a list of FixProposals.
 from __future__ import annotations
 
 from workflow_clinic.doctor.fix_generators.base import BaseFixGenerator, FixProposal
-from workflow_clinic.schema.gap_report import Gap, GapReport
+from workflow_clinic.schema.gap_report import GapReport
 from workflow_clinic.doctor.fix_generators.nextflow_fixes import (
     ContainerMissingFixer,
     ContainerLatestTagFixer,

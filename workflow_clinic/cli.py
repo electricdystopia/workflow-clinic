@@ -279,8 +279,8 @@ def _render_markdown(report: GapReport) -> str:
     lines.append(f"**Schema version:** {report.schema_version}\n")
 
     lines.append("## Summary\n")
-    lines.append(f"| Metric | Value |")
-    lines.append(f"|---|---|")
+    lines.append("| Metric | Value |")
+    lines.append("|---|---|")
     lines.append(f"| Cloud Readiness Score | **{s.cloud_readiness_score:.2f} / 1.00** |")
     lines.append(f"| Total Gaps | {s.total_gaps} |")
     lines.append(f"| Critical | {s.critical} |")
@@ -400,7 +400,6 @@ def doctor(
  
 def _serialize_proposals(proposals: list[FixProposal]) -> list[dict]:
     """Convert a list of FixProposal dataclasses to JSON-safe dicts."""
-    import dataclasses
     return [dataclasses.asdict(p) for p in proposals]
  
  

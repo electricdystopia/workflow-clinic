@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import urllib.parse
 from dataclasses import dataclass, field
-from pathlib import Path
+# from pathlib import Path
 
 import httpx
 
