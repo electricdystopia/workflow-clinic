@@ -5,6 +5,7 @@ output content, and file writing without depending on terminal rendering.
 
 from pathlib import Path
 from typer.testing import CliRunner
+from unittest.mock import patch
 from workflow_clinic.cli import app
 import json
 
@@ -126,3 +127,60 @@ def test_parse_still_works():
     result = runner.invoke(app, ["parse", str(FIXTURES / "clean.nf")])
     assert result.exit_code == 0
     assert "ALIGN" in result.output
+
+# ── doctor command ────────────────────────────────────────────────────────────
+
+@patch("workflow_clinic.doctor.fix_generators.nextflow_fixes.LLMClient")
+def test_doctor_runs_on_broken_fixture(mock_llm_cls):
+    mock_llm_cls.return_value.complete.return_value = (
+        "quay.io/biocontainers/bwa:0.7.17--h5bf99c6_8"
+    )
+    result = runner.invoke(
+        app, ["doctor", str(FIXTURES / "broken.nf"), "--gap", "CONTAINER-001"]
+    )
+    assert result.exit_code == 0
+
+
+@patch("workflow_clinic.doctor.fix_generators.nextflow_fixes.LLMClient")
+def test_doctor_output_contains_diff(mock_llm_cls):
+    mock_llm_cls.return_value.complete.return_value = (
+        "quay.io/biocontainers/bwa:0.7.17--h5bf99c6_8"
+    )
+    result = runner.invoke(
+        app, ["doctor", str(FIXTURES / "broken.nf"), "--gap", "CONTAINER-001"]
+    )
+    assert "container" in result.output
+
+
+@patch("workflow_clinic.doctor.fix_generators.nextflow_fixes.LLMClient")
+def test_doctor_no_gaps_matching_filter(mock_llm_cls):
+    result = runner.invoke(
+        app, ["doctor", str(FIXTURES / "clean.nf"), "--gap", "CONTAINER-001"]
+    )
+    assert result.exit_code == 0
+    assert "No" in result.output
+
+
+def test_doctor_missing_file_exits_nonzero():
+    result = runner.invoke(app, ["doctor", "does_not_exist.nf"])
+    assert result.exit_code == 1
+
+
+@patch("workflow_clinic.doctor.fix_generators.nextflow_fixes.LLMClient")
+def test_doctor_output_writes_json_file(mock_llm_cls):
+    mock_llm_cls.return_value.complete.return_value = (
+        "quay.io/biocontainers/bwa:0.7.17--h5bf99c6_8"
+    )
+    import tempfile, json
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+        out = Path(f.name)
+
+    result = runner.invoke(app, [
+        "doctor", str(FIXTURES / "broken.nf"),
+        "--gap", "CONTAINER-001",
+        "--output", str(out),
+    ])
+    assert result.exit_code == 0
+    assert out.exists()
+    data = json.loads(out.read_text())
+    assert "proposals" in data

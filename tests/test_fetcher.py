@@ -163,3 +163,89 @@ def test_github_all_candidates_fail_raises(mock_client_cls):
 def test_unrecognised_source_raises():
     with pytest.raises(ValueError, match="Unrecognised remote source"):
         fetch("ftp://some.random.url/workflow.nf")
+
+# ── GitHub full-repo fetcher ──────────────────────────────────────────────────
+
+def _mock_github_full_client(content: str = _SAMPLE_NF) -> MagicMock:
+    """
+    Mock for _fetch_github_full — needs three sequential responses:
+    1. repo metadata (default branch)
+    2. branch info (commit SHA)
+    3. git tree (list of .nf files)
+    Then one response per .nf file fetched.
+    """
+    repo_response = MagicMock()
+    repo_response.json.return_value = {"default_branch": "main"}
+    repo_response.raise_for_status = MagicMock()
+
+    branch_response = MagicMock()
+    branch_response.json.return_value = {"commit": {"sha": "abc123"}}
+    branch_response.raise_for_status = MagicMock()
+
+    tree_response = MagicMock()
+    tree_response.json.return_value = {
+        "tree": [
+            {"type": "blob", "path": "main.nf"},
+            {"type": "blob", "path": "modules/local/align.nf"},
+            {"type": "blob", "path": "nextflow.config"},  # non-.nf, should be ignored
+        ]
+    }
+    tree_response.raise_for_status = MagicMock()
+
+    nf_response_1 = MagicMock()
+    nf_response_1.status_code = 200
+    nf_response_1.text = content
+
+    nf_response_2 = MagicMock()
+    nf_response_2.status_code = 200
+    nf_response_2.text = content
+
+    mock_client = MagicMock()
+    mock_client.__enter__ = MagicMock(return_value=mock_client)
+    mock_client.__exit__ = MagicMock(return_value=False)
+    mock_client.get.side_effect = [
+        repo_response,
+        branch_response,
+        tree_response,
+        nf_response_1,
+        nf_response_2,
+    ]
+
+    return mock_client
+
+
+@patch("workflow_clinic.core.fetcher.httpx.Client")
+def test_github_full_returns_fetched_workflow(mock_client_cls):
+    mock_client_cls.return_value = _mock_github_full_client()
+    result = fetch("https://github.com/nf-core/rnaseq", full_repo=True)
+    assert isinstance(result, FetchedWorkflow)
+
+
+@patch("workflow_clinic.core.fetcher.httpx.Client")
+def test_github_full_combines_all_nf_files(mock_client_cls):
+    mock_client_cls.return_value = _mock_github_full_client()
+    result = fetch("https://github.com/nf-core/rnaseq", full_repo=True)
+    # Both .nf files should be in the combined content
+    assert result.content.count("process ALIGN") == 2
+
+
+@patch("workflow_clinic.core.fetcher.httpx.Client")
+def test_github_full_adds_file_path_headers(mock_client_cls):
+    mock_client_cls.return_value = _mock_github_full_client()
+    result = fetch("https://github.com/nf-core/rnaseq", full_repo=True)
+    assert "// === FILE: main.nf ===" in result.content
+    assert "// === FILE: modules/local/align.nf ===" in result.content
+
+
+@patch("workflow_clinic.core.fetcher.httpx.Client")
+def test_github_full_ignores_non_nf_files(mock_client_cls):
+    mock_client_cls.return_value = _mock_github_full_client()
+    result = fetch("https://github.com/nf-core/rnaseq", full_repo=True)
+    assert "nextflow.config" not in result.content
+
+
+@patch("workflow_clinic.core.fetcher.httpx.Client")
+def test_github_full_files_list_is_populated(mock_client_cls):
+    mock_client_cls.return_value = _mock_github_full_client()
+    result = fetch("https://github.com/nf-core/rnaseq", full_repo=True)
+    assert len(result.files) == 2
