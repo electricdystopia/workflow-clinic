@@ -37,8 +37,6 @@ import json
 from pathlib import Path
 from typer.testing import CliRunner
 
-import pytest
-
 from workflow_clinic.critic.engine import CriticEngine
 from workflow_clinic.critic.rules.resource_hints import CpusMissingRule, MemoryMissingRule
 from workflow_clinic.parsers.nextflow import NextflowParser

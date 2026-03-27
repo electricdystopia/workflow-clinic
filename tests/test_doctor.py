@@ -6,9 +6,7 @@ LLM calls are mocked — tests run without any API key.
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
-
-import pytest
+from unittest.mock import patch
 
 from workflow_clinic.critic.engine import CriticEngine
 from workflow_clinic.doctor.engine import DoctorEngine

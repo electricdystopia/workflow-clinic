@@ -5,7 +5,6 @@ Actual HTTP calls are mocked — no API key required.
 
 from __future__ import annotations
 
-import os
 from unittest.mock import MagicMock, patch
 
 import pytest

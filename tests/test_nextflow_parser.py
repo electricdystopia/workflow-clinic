@@ -1,5 +1,4 @@
 from pathlib import Path
-import pytest
 from workflow_clinic.parsers.nextflow import NextflowParser
 
 

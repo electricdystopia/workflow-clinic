@@ -9,8 +9,6 @@ tests for CLI auto-detection via the ParserRegistry.
 from __future__ import annotations
 
 from pathlib import Path
-
-import pytest
 from typer.testing import CliRunner
 
 from workflow_clinic.cli import app

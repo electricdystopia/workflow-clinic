@@ -7,7 +7,7 @@ from pathlib import Path
 from typer.testing import CliRunner
 from unittest.mock import patch
 from workflow_clinic.cli import app
-import json
+import tempfile, json
 
 FIXTURES = Path(__file__).parent / "fixtures" / "nextflow"
 runner = CliRunner()
@@ -171,7 +171,6 @@ def test_doctor_output_writes_json_file(mock_llm_cls):
     mock_llm_cls.return_value.complete.return_value = (
         "quay.io/biocontainers/bwa:0.7.17--h5bf99c6_8"
     )
-    import tempfile, json
     with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
         out = Path(f.name)
 

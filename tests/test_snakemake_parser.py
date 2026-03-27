@@ -5,7 +5,6 @@ asserting exact field values rather than just presence.
 """
 
 from pathlib import Path
-import pytest
 
 from workflow_clinic.parsers.snakemake import SnakemakeParser
 from workflow_clinic.parsers.registry import ParserRegistry

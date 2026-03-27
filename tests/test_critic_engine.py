@@ -1,9 +1,8 @@
 from pathlib import Path
-import pytest
 
 from workflow_clinic.parsers.nextflow import NextflowParser
 from workflow_clinic.critic.engine import CriticEngine
-from workflow_clinic.schema.gap_report import Severity, GapCategory
+from workflow_clinic.schema.gap_report import Severity
 
 FIXTURES = Path(__file__).parent / "fixtures" / "nextflow"
 parser = NextflowParser()
