@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 
 from workflow_clinic.critic.rules.base import BaseRule
 from workflow_clinic.critic.rules.containerization import (
+    ContainerCondaIsolationRule,   # Day 8 — Snakemake conda isolation
     ContainerLatestTagRule,
     ContainerMissingRule,
 )
@@ -23,21 +24,19 @@ from workflow_clinic.schema.gap_report import (
     Gap, GapReport, GapSummary, Severity,
 )
 
-# Registry of all active rules — add new ones here as you build them.
-# Order matters for display: critical container rules first, then
-# storage/IO, then resource hints (least severe category last).
+# Registry of all active rules.
+# Order: container rules (highest severity) → reproducibility → storage/IO
+#        → resource hints (lowest severity).
 _RULES: list[BaseRule] = [
     ContainerMissingRule(),
     ContainerLatestTagRule(),
+    ContainerCondaIsolationRule(),   # Day 8: CONTAINER-003 for Snakemake conda
     HardcodedPathRule(),
     UndeclaredOutputRule(),
     CpusMissingRule(),
     MemoryMissingRule(),
 ]
 
-# Severity weights used to compute the cloud readiness score.
-# A workflow with only INFO gaps scores close to 1.0.
-# A workflow with CRITICAL gaps is penalised heavily.
 _SEVERITY_PENALTY: dict[Severity, float] = {
     Severity.CRITICAL: 0.25,
     Severity.MAJOR:    0.10,
@@ -54,7 +53,6 @@ def _compute_score(gaps: list[Gap]) -> float:
 class CriticEngine:
 
     def __init__(self, rules: list[BaseRule] | None = None) -> None:
-        # Allow injecting a custom rule list in tests
         self._rules = rules if rules is not None else _RULES
 
     def run(self, workflow: ParsedWorkflow) -> GapReport:

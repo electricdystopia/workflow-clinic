@@ -16,6 +16,7 @@ from rich import box
 
 from workflow_clinic.critic.engine import CriticEngine
 from workflow_clinic.parsers.nextflow import NextflowParser
+from workflow_clinic.parsers.registry import ParserRegistry
 from workflow_clinic.schema.gap_report import GapReport, Severity
 
 from workflow_clinic.doctor.engine import DoctorEngine
@@ -70,8 +71,7 @@ def parse(
         err_console.print(f"[red]File not found:[/red] {path}")
         raise typer.Exit(1)
 
-    parser = NextflowParser()
-    workflow = parser.parse_file(path)
+    workflow = ParserRegistry().get_parser(path).parse_file(path)
 
     if not workflow.processes:
         console.print("[yellow]No processes found in workflow.[/yellow]")
@@ -162,7 +162,7 @@ def critic(
         if not path.exists():
             err_console.print(f"[red]File not found:[/red] {path}")
             raise typer.Exit(1)
-        workflow = NextflowParser().parse_file(path)
+        workflow = ParserRegistry().get_parser(path).parse_file(path)
         display_path = path
 
     else:
@@ -412,7 +412,7 @@ def _render_github_issue(report: GapReport) -> tuple[str, str]:
         )
         lines.append(f"**Auto-fixable:** {'Yes' if g.auto_fixable else 'No'}")
         lines.append("")
-        lines.append(f"**Description:**  ")
+        lines.append("**Description:**  ")
         lines.append(g.description)
         lines.append("")
         if g.evidence:
@@ -591,7 +591,7 @@ def doctor(
 
     source       = path.read_text(encoding="utf-8")
     source_lines = source.splitlines(keepends=True)
-    workflow     = NextflowParser().parse_file(path)
+    workflow     = ParserRegistry().get_parser(path).parse_file(path)
     report       = CriticEngine().run(workflow)
 
     if gap:

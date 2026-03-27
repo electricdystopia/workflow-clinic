@@ -29,6 +29,9 @@ class NextflowProcess:
     container: str | None = None
     cpus: str | None = None
     memory: str | None = None
+    # Added in Day 8: populated by SnakemakeParser for `conda:` directives.
+    # Always None for Nextflow processes — existing rules are unaffected.
+    conda: str | None = None
     input: DirectiveBlock = field(default_factory=DirectiveBlock)
     output: DirectiveBlock = field(default_factory=DirectiveBlock)
     script: DirectiveBlock = field(default_factory=DirectiveBlock)
@@ -41,6 +44,8 @@ class NextflowProcess:
             found.append("cpus")
         if self.memory:
             found.append("memory")
+        if self.conda:                  # Day 8: conda is a first-class directive
+            found.append("conda")
         if self.input.raw:
             found.append("input")
         if self.output.raw:
@@ -102,7 +107,7 @@ class NextflowParser:
         self, name: str, lines: list[str], start: int
     ) -> tuple[NextflowProcess, int]:
         proc = NextflowProcess(name=name, line_start=start + 1, line_end=start + 1)
-        depth = 0          # brace depth
+        depth = 0
         current_section: str | None = None
         i = start
 
@@ -110,12 +115,10 @@ class NextflowParser:
             line = lines[i]
             depth += line.count("{") - line.count("}")
 
-            # Leaving the process block
             if depth <= 0 and i > start:
                 proc.line_end = i + 1
                 return proc, i + 1
 
-            # Single-line directives
             if m := _RE_CONTAINER.match(line):
                 proc.container = m.group(1)
                 current_section = None
@@ -125,8 +128,6 @@ class NextflowParser:
             elif m := _RE_MEMORY.match(line):
                 proc.memory = m.group(1)
                 current_section = None
-
-            # Section headers (input:, output:, script:, …)
             elif _RE_INPUT_START.match(line):
                 current_section = "input"
             elif _RE_OUTPUT_START.match(line):
@@ -134,15 +135,12 @@ class NextflowParser:
             elif _RE_SCRIPT_START.match(line):
                 current_section = "script"
             elif _RE_SECTION_START.match(line) and i > start:
-                current_section = None  # unrecognised section resets
-
-            # Body lines for current section
+                current_section = None
             elif current_section and line.strip():
                 block = getattr(proc, current_section)
                 block.lines.append(line)
 
             i += 1
 
-        # EOF without closing brace — still return what we have
         proc.line_end = i
         return proc, i
