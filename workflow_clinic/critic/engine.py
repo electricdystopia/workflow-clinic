@@ -13,18 +13,26 @@ from workflow_clinic.critic.rules.containerization import (
     ContainerMissingRule,
 )
 from workflow_clinic.critic.rules.io_declaration import UndeclaredOutputRule
+from workflow_clinic.critic.rules.resource_hints import (
+    CpusMissingRule,
+    MemoryMissingRule,
+)
 from workflow_clinic.critic.rules.storage import HardcodedPathRule
 from workflow_clinic.parsers.nextflow import ParsedWorkflow
 from workflow_clinic.schema.gap_report import (
     Gap, GapReport, GapSummary, Severity,
 )
 
-# Registry of all active rules — add new ones here as you build them
+# Registry of all active rules — add new ones here as you build them.
+# Order matters for display: critical container rules first, then
+# storage/IO, then resource hints (least severe category last).
 _RULES: list[BaseRule] = [
     ContainerMissingRule(),
     ContainerLatestTagRule(),
     HardcodedPathRule(),
     UndeclaredOutputRule(),
+    CpusMissingRule(),
+    MemoryMissingRule(),
 ]
 
 # Severity weights used to compute the cloud readiness score.
