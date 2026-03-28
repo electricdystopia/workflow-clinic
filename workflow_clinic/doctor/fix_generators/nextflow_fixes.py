@@ -145,6 +145,7 @@ class ContainerMissingFixer(BaseFixGenerator):
             validation_output=validation_output,
             confidence=0.85 if validation_passed else 0.4,
             human_review_required=not validation_passed,
+            patched_content=patched_source,   # ← Day 9: stored for --create-pr
         )
 
     # ── Helpers ───────────────────────────────────────────────────────────────
@@ -271,6 +272,7 @@ class ContainerLatestTagFixer(BaseFixGenerator):
                 validation_output=str(exc),
                 confidence=0.0,
                 human_review_required=True,
+                patched_content="",  # ← Day 9: stored for --create-pr
             )
 
         # ── Step 2: replace the container line in source ──────────────────────

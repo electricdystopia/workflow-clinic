@@ -7,7 +7,7 @@ optional FixProposal out. None means the generator can't handle this gap.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from workflow_clinic.schema.gap_report import Gap
 
@@ -22,6 +22,10 @@ class FixProposal:
     validation_output:     str
     confidence:            float  # 0.0–1.0
     human_review_required: bool
+    # Day 9: full patched file content, used by --create-pr to commit the fix.
+    # Empty string means the fixer could not produce a valid patch (e.g. LLM
+    # failure) and --create-pr will skip this proposal with a warning.
+    patched_content: str = field(default="")
 
 
 class BaseFixGenerator(ABC):

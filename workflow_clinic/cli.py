@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 from enum import Enum
 from pathlib import Path
+import os
 
 import typer
 from rich.console import Console
@@ -115,45 +116,58 @@ def critic(
     source: str = typer.Argument(
         ...,
         help=(
-            "Path to a .nf file, or a remote source:\n\n"
+            "Path to a .nf or .smk file, or a remote source:\n\n"
             "  dockstore:github.com/owner/repo\n\n"
             "  https://github.com/owner/repo"
         ),
     ),
     format: OutputFormat = typer.Option(
-        OutputFormat.terminal,
-        "--format", "-f",
+        OutputFormat.terminal, "--format", "-f",
         help="Output format: terminal (default), json, or markdown.",
     ),
     output: Path | None = typer.Option(
-        None,
-        "--output", "-o",
+        None, "--output", "-o",
         help="Save the report to this file instead of printing to stdout.",
     ),
     score: bool = typer.Option(
-        False,
-        "--score",
+        False, "--score",
         help="Print only the cloud readiness score (0.0–1.0) and exit.",
     ),
     create_issue: bool = typer.Option(
-        False,
-        "--create-issue",
+        False, "--create-issue",
         help=(
             "Draft a GitHub issue body from the gap report. "
-            "The draft is written to --issue-output (or printed to stdout "
-            "if --issue-output is not given). Does not submit anything to GitHub."
+            "Does not submit anything to GitHub unless --submit is also passed."
         ),
     ),
     issue_output: Path | None = typer.Option(
-        None,
-        "--issue-output",
+        None, "--issue-output",
         help="Save the drafted GitHub issue body to this file (implies --create-issue).",
     ),
+    submit: bool = typer.Option(
+        False, "--submit",
+        help=(
+            "POST the issue to GitHub (implies --create-issue). "
+            "Requires GITHUB_TOKEN in the environment and --repo."
+        ),
+    ),
+    repo: str | None = typer.Option(
+        None, "--repo",
+        help=(
+            "Target GitHub repository as owner/repo (e.g. nf-core/rnaseq). "
+            "Inferred from the source URL when the source is a GitHub or "
+            "Dockstore identifier; required for local files."
+        ),
+    ),
 ) -> None:
-    """Analyse a Nextflow workflow and report cloud-readiness gaps."""
+    """Analyse a Nextflow or Snakemake workflow and report cloud-readiness gaps."""
 
     # --issue-output implies --create-issue
     if issue_output is not None:
+        create_issue = True
+
+    # --submit implies --create-issue
+    if submit:
         create_issue = True
 
     # ── Resolve source → ParsedWorkflow ──────────────────────────────────────
@@ -200,6 +214,8 @@ def critic(
 
         if create_issue:
             _handle_issue_draft(report, issue_output)
+        if submit:
+            _submit_issue_to_github(report, source, repo)
         return
 
     # ── Write or print gap report ─────────────────────────────────────────────
@@ -215,6 +231,8 @@ def critic(
     # ── Issue draft (runs after main report in all non-terminal modes) ────────
     if create_issue:
         _handle_issue_draft(report, issue_output)
+    if submit:
+        _submit_issue_to_github(report, source, repo)
 
 
 def _handle_issue_draft(report: GapReport, issue_output: Path | None) -> None:
@@ -244,6 +262,244 @@ def _handle_issue_draft(report: GapReport, issue_output: Path | None) -> None:
             "Use --issue-output to save it, then create the issue manually "
             "or add --submit (coming in Day 9) to post it automatically.[/dim]"
         )
+
+
+# ── GitHub submission helpers (Day 9) ─────────────────────────────────────────
+
+def _resolve_repo(repo_flag: str | None, source: str) -> str | None:
+    """
+    Return 'owner/repo' from the explicit --repo flag or inferred from source.
+
+    Handles the four source formats the CLI accepts:
+        dockstore:github.com/owner/repo
+        https://github.com/owner/repo
+        github:owner/repo
+        github.com/owner/repo
+    Returns None for local file paths — the caller must require --repo.
+    """
+    if repo_flag:
+        return repo_flag
+    for prefix in (
+        "dockstore:github.com/",
+        "https://github.com/",
+        "github.com/",
+        "github:",
+    ):
+        if prefix in source:
+            tail  = source.split(prefix, 1)[1]
+            parts = tail.split("/")
+            if len(parts) >= 2:
+                return f"{parts[0]}/{parts[1]}"
+    return None
+
+
+def _render_pr_body(proposal: "FixProposal") -> str:
+    """
+    Build a GitHub PR body for a single FixProposal.
+
+    Mirrors the _render_github_issue structure so issues and PRs are visually
+    consistent in the GitHub UI: attribution blockquote, fix summary, diff
+    in a code fence, and a human-review warning when validation was partial.
+    """
+    from workflow_clinic.doctor.fix_generators.base import FixProposal as FP
+    lines: list[str] = [
+        "## 🏥 Workflow Clinic — Automated Fix",
+        "",
+        "> **This PR was opened automatically by "
+        "[Workflow Clinic](https://github.com/electricdystopia/workflow-clinic), "
+        "a GA4GH Cloud Work Stream tool for cloud-readiness gap remediation.**",
+        "",
+        f"**Gap:** `{proposal.gap_id}`  ",
+        f"**Process:** `{proposal.process_name}`  ",
+        f"**Fix:** {proposal.description}  ",
+        f"**Confidence:** {proposal.confidence:.0%}  ",
+        (
+            "**Validated:** ✓ Parser confirmed the fix is syntactically correct."
+            if proposal.validation_passed
+            else "**Validated:** ✗ Syntactic validation failed — review carefully."
+        ),
+        "",
+        "### Diff",
+        "",
+        "```diff",
+        proposal.unified_diff.rstrip(),
+        "```",
+        "",
+    ]
+    if proposal.human_review_required:
+        lines += [
+            "> ⚠️ **Human review required before merging.** The fix was not "
+            "fully validated — confirm the suggested image exists on its "
+            "registry before approving.",
+            "",
+        ]
+    lines += [
+        "---",
+        "_Generated by "
+        "[Workflow Clinic](https://github.com/electricdystopia/workflow-clinic)_",
+    ]
+    return "\n".join(lines)
+
+
+def _submit_issue_to_github(
+    report: GapReport,
+    source: str,
+    repo_flag: str | None,
+) -> None:
+    """
+    POST the gap report as a GitHub issue, or add a comment if one exists.
+
+    Reads GITHUB_TOKEN from the environment.  Parses owner/repo from
+    --repo or infers it from the source URL.  Checks for an existing open
+    issue with the workflow-clinic label before creating a new one
+    (deduplication prevents the bot from spamming a repository with
+    duplicate issues on every CI run).
+    """
+    token = os.getenv("GITHUB_TOKEN")
+    if not token:
+        err_console.print(
+            "[red]--submit requires GITHUB_TOKEN to be set in the environment.[/red]\n"
+            "  export GITHUB_TOKEN=ghp_..."
+        )
+        raise typer.Exit(1)
+
+    repo_str = _resolve_repo(repo_flag, source)
+    if not repo_str or "/" not in repo_str:
+        err_console.print(
+            "[red]Cannot determine the target repository.[/red]\n"
+            "  Pass [bold]--repo owner/repo[/bold] explicitly, or use a GitHub "
+            "source URL so it can be inferred automatically."
+        )
+        raise typer.Exit(1)
+
+    owner, repo_name = repo_str.split("/", 1)
+    title, body      = _render_github_issue(report)
+    labels           = _issue_labels(report)
+
+    from workflow_clinic.core.github_client import GitHubClient
+    client = GitHubClient(token)
+
+    # Deduplication: search for an existing open WC issue on this repo.
+    # We use "[Workflow Clinic]" as the title marker — it is present in every
+    # title produced by _render_github_issue().
+    existing = client.find_existing_issue(owner, repo_name, "[Workflow Clinic]")
+
+    if existing is not None:
+        console.print(
+            f"[yellow]Open issue #{existing} already exists for this repo. "
+            f"Appending the updated report as a comment.[/yellow]"
+        )
+        comment_body = (
+            "## 📋 Updated Workflow Clinic Report\n\n"
+            f"_(Re-run on {report.generated_at.strftime('%Y-%m-%d %H:%M UTC')})_\n\n"
+            + body
+        )
+        url = client.add_comment(owner, repo_name, existing, comment_body)
+        console.print(f"[green]✓ Comment added:[/green] {url}")
+    else:
+        url = client.create_issue(owner, repo_name, title, body, labels)
+        console.print(f"[green]✓ Issue created:[/green] {url}")
+
+
+def _submit_pr_to_github(
+    proposal:      "FixProposal",
+    source_path:   Path,
+    repo_flag:     str | None,
+    branch_prefix: str,
+) -> None:
+    """
+    Apply a FixProposal by committing the patched file to a new branch and
+    opening a pull request.
+
+    Branch name: {prefix}/{gap_id_lower}/{process_name_lower}
+    e.g. wf-clinic/container-001/align
+
+    The file committed to the repo is named after the source file's basename.
+    For a workflow at /home/user/project/main.nf, the file committed is main.nf
+    at the root of the repo.  Pass --repo explicitly since there is no source
+    URL to infer from for local files.
+    """
+    from workflow_clinic.core.github_client import GitHubClient
+
+    token = os.getenv("GITHUB_TOKEN")
+    if not token:
+        err_console.print(
+            "[red]--create-pr requires GITHUB_TOKEN to be set in the environment.[/red]\n"
+            "  export GITHUB_TOKEN=ghp_..."
+        )
+        raise typer.Exit(1)
+
+    if not repo_flag or "/" not in repo_flag:
+        err_console.print(
+            "[red]--create-pr requires --repo owner/repo.[/red]\n"
+            "  The target repository cannot be inferred from a local file path."
+        )
+        raise typer.Exit(1)
+
+    owner, repo_name = repo_flag.split("/", 1)
+    client           = GitHubClient(token)
+
+    # ── Resolve base branch ───────────────────────────────────────────────────
+    try:
+        base_branch = client.get_default_branch(owner, repo_name)
+    except Exception as exc:
+        err_console.print(f"[red]Could not resolve default branch: {exc}[/red]")
+        raise typer.Exit(1)
+
+    # ── Build branch name ─────────────────────────────────────────────────────
+    slug = (
+        f"{proposal.gap_id}/{proposal.process_name}"
+        .lower()
+        .replace("_", "-")
+        .replace(" ", "-")
+    )
+    branch_name = f"{branch_prefix}/{slug}"
+
+    console.print(f"[dim]Creating branch '{branch_name}' off '{base_branch}'...[/dim]")
+    try:
+        client.create_branch(owner, repo_name, base_branch, branch_name)
+    except Exception as exc:
+        err_console.print(
+            f"[red]Failed to create branch '{branch_name}': {exc}[/red]\n"
+            "  The branch may already exist. Delete it or run with a different "
+            "--branch-prefix."
+        )
+        raise typer.Exit(1)
+
+    # ── Commit the patched file ───────────────────────────────────────────────
+    file_path_in_repo = source_path.name   # e.g. "main.nf" or "workflow.smk"
+    commit_message = (
+        f"fix({proposal.gap_id.lower()}): {proposal.description}\n\n"
+        f"Process:    {proposal.process_name}\n"
+        f"Confidence: {proposal.confidence:.0%}\n"
+        f"Validated:  {'yes' if proposal.validation_passed else 'no'}\n\n"
+        "Applied automatically by Workflow Clinic.\n"
+        "https://github.com/electricdystopia/workflow-clinic"
+    )
+    console.print(f"[dim]Committing '{file_path_in_repo}' to '{branch_name}'...[/dim]")
+    try:
+        client.commit_file(
+            owner, repo_name, branch_name,
+            file_path_in_repo, proposal.patched_content, commit_message,
+        )
+    except Exception as exc:
+        err_console.print(f"[red]Failed to commit patched file: {exc}[/red]")
+        raise typer.Exit(1)
+
+    # ── Open the PR ───────────────────────────────────────────────────────────
+    pr_title = (
+        f"[Workflow Clinic] Fix {proposal.gap_id} in `{proposal.process_name}`"
+    )
+    pr_body = _render_pr_body(proposal)
+    console.print(f"[dim]Opening PR '{pr_title}'...[/dim]")
+    try:
+        pr_url = client.create_pull_request(
+            owner, repo_name, branch_name, base_branch, pr_title, pr_body,
+        )
+        console.print(f"[green]✓ PR created:[/green] {pr_url}")
+    except Exception as exc:
+        err_console.print(f"[red]Failed to create PR: {exc}[/red]")
+        raise typer.Exit(1)
 
 
 def _issue_labels(report: GapReport) -> list[str]:
@@ -572,19 +828,33 @@ def _render_markdown(report: GapReport) -> str:
 
 @app.command("doctor")
 def doctor(
-    path: Path = typer.Argument(..., help="Path to a .nf workflow file"),
+    path: Path = typer.Argument(..., help="Path to a .nf or .smk workflow file"),
     gap: str | None = typer.Option(
-        None,
-        "--gap", "-g",
+        None, "--gap", "-g",
         help="Only fix gaps with this ID, e.g. CONTAINER-001.",
     ),
     output: Path | None = typer.Option(
-        None,
-        "--output", "-o",
+        None, "--output", "-o",
         help="Save fix proposals as JSON to this file.",
     ),
+    create_pr: bool = typer.Option(
+        False, "--create-pr",
+        help=(
+            "Apply each validated fix and open a pull request on GitHub. "
+            "Requires GITHUB_TOKEN in the environment and --repo."
+        ),
+    ),
+    branch_prefix: str = typer.Option(
+        "wf-clinic", "--branch-prefix",
+        help="Branch name prefix for fix branches (default: wf-clinic). "
+             "The full branch name is {prefix}/{gap-id}/{process-name}.",
+    ),
+    repo: str | None = typer.Option(
+        None, "--repo",
+        help="Target GitHub repository as owner/repo (required for --create-pr).",
+    ),
 ) -> None:
-    """Generate fixes for auto-fixable gaps in a Nextflow workflow."""
+    """Generate and optionally submit fixes for auto-fixable gaps."""
     if not path.exists():
         err_console.print(f"[red]File not found:[/red] {path}")
         raise typer.Exit(1)
@@ -646,6 +916,32 @@ def doctor(
                 else:
                     console.print(line)
         console.print()
+
+    # ── --create-pr: commit each validated fix and open a PR ─────────────────
+    if create_pr:
+        submitted = 0
+        for proposal in proposals:
+            if not proposal.validation_passed:
+                console.print(
+                    f"[yellow]Skipping {proposal.gap_id}/{proposal.process_name} "
+                    f"— validation failed (confidence {proposal.confidence:.0%}). "
+                    f"Review the diff manually before applying.[/yellow]"
+                )
+                continue
+            if not proposal.patched_content:
+                console.print(
+                    f"[yellow]Skipping {proposal.gap_id}/{proposal.process_name} "
+                    f"— no patched content available.[/yellow]"
+                )
+                continue
+            _submit_pr_to_github(proposal, path, repo, branch_prefix)
+            submitted += 1
+
+        if submitted == 0:
+            console.print(
+                "[yellow]No proposals were suitable for PR creation. "
+                "Run without --create-pr to review diffs manually.[/yellow]"
+            )
 
 
 def _serialize_proposals(proposals: list[FixProposal]) -> list[dict[str, object]]:
