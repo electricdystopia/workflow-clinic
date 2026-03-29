@@ -1,151 +1,601 @@
 {
   "schema_version": "0.1.0",
-  "generated_at": "2026-03-27T15:25:30.488438Z",
-  "workflow_path": "tests/fixtures/nextflow/broken.nf",
+  "generated_at": "2026-03-28T18:43:28.382250Z",
+  "workflow_path": "main.nf",
   "gaps": [
     {
       "gap_id": "CONTAINER-001",
-      "process_name": "ALIGN",
+      "process_name": "ARIA2",
       "category": "containerization",
       "severity": "CRITICAL",
       "location": {
-        "file": "tests/fixtures/nextflow/broken.nf",
-        "line_start": 1,
-        "line_end": 11
+        "file": "main.nf",
+        "line_start": 110,
+        "line_end": 156
       },
-      "description": "Process 'ALIGN' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "description": "Process 'ARIA2' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
       "evidence": "",
-      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n\nFor Snakemake, use a singularity directive:\n    singularity: \"docker://quay.io/biocontainers/tool:1.0.0\"",
       "auto_fixable": true
     },
     {
-      "gap_id": "STORAGE-001",
-      "process_name": "ALIGN",
-      "category": "storage",
-      "severity": "MAJOR",
-      "location": {
-        "file": "tests/fixtures/nextflow/broken.nf",
-        "line_start": 1,
-        "line_end": 11
-      },
-      "description": "Process 'ALIGN' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
-      "evidence": "/data/ref/hg38.fa, /scratch/aligned.bam",
-      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
-      "auto_fixable": false
-    },
-    {
-      "gap_id": "IO-001",
-      "process_name": "ALIGN",
-      "category": "io_declaration",
-      "severity": "MAJOR",
-      "location": {
-        "file": "tests/fixtures/nextflow/broken.nf",
-        "line_start": 1,
-        "line_end": 11
-      },
-      "description": "Process 'ALIGN' has no output declaration. Workflow engines cannot chain this process to downstream steps or track its results without explicit outputs.",
-      "evidence": "",
-      "recommendation": "Add an output: block declaring all files this process produces, e.g.:\n    output:\n        path \"*.bam\"",
-      "auto_fixable": false
-    },
-    {
       "gap_id": "RESOURCE-001",
-      "process_name": "ALIGN",
+      "process_name": "ARIA2",
       "category": "resource_hints",
       "severity": "MINOR",
       "location": {
-        "file": "tests/fixtures/nextflow/broken.nf",
-        "line_start": 1,
-        "line_end": 11
+        "file": "main.nf",
+        "line_start": 110,
+        "line_end": 156
       },
-      "description": "Process 'ALIGN' has no cpus directive. Cloud schedulers cannot allocate the correct number of CPU cores without an explicit declaration, leading to either over-provisioning (wasted cost) or under-provisioning (slow or failed runs). The tool cannot parallelise itself via ${task.cpus} without this value.",
+      "description": "Process 'ARIA2' has no cpus directive. Cloud schedulers cannot allocate the correct number of CPU cores without an explicit declaration, leading to either over-provisioning (wasted cost) or under-provisioning (slow or failed runs). The tool cannot parallelise itself via ${task.cpus} without this value.",
       "evidence": "",
       "recommendation": "Add a cpus directive appropriate for the tool's parallelism:\n    cpus 4\n\nReference the allocation in the script block so the tool actually uses the provisioned cores:\n    bwa mem -t ${task.cpus} ...\n\nFor workflows that need to scale, consider a dynamic expression:\n    cpus { reads.size() > 5.GB ? 8 : 4 }",
       "auto_fixable": false
     },
     {
       "gap_id": "RESOURCE-002",
-      "process_name": "ALIGN",
+      "process_name": "ARIA2",
       "category": "resource_hints",
       "severity": "MINOR",
       "location": {
-        "file": "tests/fixtures/nextflow/broken.nf",
-        "line_start": 1,
-        "line_end": 11
+        "file": "main.nf",
+        "line_start": 110,
+        "line_end": 156
       },
-      "description": "Process 'ALIGN' has no memory directive. Cloud schedulers cannot reserve sufficient RAM without an explicit declaration. Memory-hungry bioinformatics tools (aligners, variant callers) will be killed by OOM errors on instances with inadequate RAM, with no meaningful error message.",
+      "description": "Process 'ARIA2' has no memory directive. Cloud schedulers cannot reserve sufficient RAM without an explicit declaration. Memory-hungry bioinformatics tools (aligners, variant callers) will be killed by OOM errors on instances with inadequate RAM, with no meaningful error message.",
       "evidence": "",
       "recommendation": "Add a memory directive sized for the tool's peak usage:\n    memory '8 GB'\n\nFor resilient pipelines, combine with an error strategy that increases memory on retry:\n    errorStrategy 'retry'\n    maxRetries 2\n    memory { (8.GB * task.attempt).clamp(null, 32.GB) }",
       "auto_fixable": false
     },
     {
       "gap_id": "CONTAINER-001",
-      "process_name": "CALL_VARIANTS",
+      "process_name": "HMMER_HMMSEARCH",
       "category": "containerization",
       "severity": "CRITICAL",
       "location": {
-        "file": "tests/fixtures/nextflow/broken.nf",
-        "line_start": 13,
-        "line_end": 23
+        "file": "main.nf",
+        "line_start": 160,
+        "line_end": 229
       },
-      "description": "Process 'CALL_VARIANTS' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "description": "Process 'HMMER_HMMSEARCH' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
       "evidence": "",
-      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n\nFor Snakemake, use a singularity directive:\n    singularity: \"docker://quay.io/biocontainers/tool:1.0.0\"",
       "auto_fixable": true
     },
     {
-      "gap_id": "IO-001",
-      "process_name": "CALL_VARIANTS",
-      "category": "io_declaration",
+      "gap_id": "STORAGE-001",
+      "process_name": "HMMER_HMMSEARCH",
+      "category": "storage",
       "severity": "MAJOR",
       "location": {
-        "file": "tests/fixtures/nextflow/broken.nf",
-        "line_start": 13,
-        "line_end": 23
+        "file": "main.nf",
+        "line_start": 160,
+        "line_end": 229
       },
-      "description": "Process 'CALL_VARIANTS' has no output declaration. Workflow engines cannot chain this process to downstream steps or track its results without explicit outputs.",
-      "evidence": "",
-      "recommendation": "Add an output: block declaring all files this process produces, e.g.:\n    output:\n        path \"*.bam\"",
+      "description": "Process 'HMMER_HMMSEARCH' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "//",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
       "auto_fixable": false
     },
     {
       "gap_id": "RESOURCE-001",
-      "process_name": "CALL_VARIANTS",
+      "process_name": "HMMER_HMMSEARCH",
       "category": "resource_hints",
       "severity": "MINOR",
       "location": {
-        "file": "tests/fixtures/nextflow/broken.nf",
-        "line_start": 13,
-        "line_end": 23
+        "file": "main.nf",
+        "line_start": 160,
+        "line_end": 229
       },
-      "description": "Process 'CALL_VARIANTS' has no cpus directive. Cloud schedulers cannot allocate the correct number of CPU cores without an explicit declaration, leading to either over-provisioning (wasted cost) or under-provisioning (slow or failed runs). The tool cannot parallelise itself via ${task.cpus} without this value.",
+      "description": "Process 'HMMER_HMMSEARCH' has no cpus directive. Cloud schedulers cannot allocate the correct number of CPU cores without an explicit declaration, leading to either over-provisioning (wasted cost) or under-provisioning (slow or failed runs). The tool cannot parallelise itself via ${task.cpus} without this value.",
       "evidence": "",
       "recommendation": "Add a cpus directive appropriate for the tool's parallelism:\n    cpus 4\n\nReference the allocation in the script block so the tool actually uses the provisioned cores:\n    bwa mem -t ${task.cpus} ...\n\nFor workflows that need to scale, consider a dynamic expression:\n    cpus { reads.size() > 5.GB ? 8 : 4 }",
       "auto_fixable": false
     },
     {
       "gap_id": "RESOURCE-002",
-      "process_name": "CALL_VARIANTS",
+      "process_name": "HMMER_HMMSEARCH",
       "category": "resource_hints",
       "severity": "MINOR",
       "location": {
-        "file": "tests/fixtures/nextflow/broken.nf",
-        "line_start": 13,
-        "line_end": 23
+        "file": "main.nf",
+        "line_start": 160,
+        "line_end": 229
       },
-      "description": "Process 'CALL_VARIANTS' has no memory directive. Cloud schedulers cannot reserve sufficient RAM without an explicit declaration. Memory-hungry bioinformatics tools (aligners, variant callers) will be killed by OOM errors on instances with inadequate RAM, with no meaningful error message.",
+      "description": "Process 'HMMER_HMMSEARCH' has no memory directive. Cloud schedulers cannot reserve sufficient RAM without an explicit declaration. Memory-hungry bioinformatics tools (aligners, variant callers) will be killed by OOM errors on instances with inadequate RAM, with no meaningful error message.",
+      "evidence": "",
+      "recommendation": "Add a memory directive sized for the tool's peak usage:\n    memory '8 GB'\n\nFor resilient pipelines, combine with an error strategy that increases memory on retry:\n    errorStrategy 'retry'\n    maxRetries 2\n    memory { (8.GB * task.attempt).clamp(null, 32.GB) }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "INTERPROSCAN",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 233,
+        "line_end": 291
+      },
+      "description": "Process 'INTERPROSCAN' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n\nFor Snakemake, use a singularity directive:\n    singularity: \"docker://quay.io/biocontainers/tool:1.0.0\"",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "INTERPROSCAN",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 233,
+        "line_end": 291
+      },
+      "description": "Process 'INTERPROSCAN' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "/share, /bin",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "RESOURCE-001",
+      "process_name": "INTERPROSCAN",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 233,
+        "line_end": 291
+      },
+      "description": "Process 'INTERPROSCAN' has no cpus directive. Cloud schedulers cannot allocate the correct number of CPU cores without an explicit declaration, leading to either over-provisioning (wasted cost) or under-provisioning (slow or failed runs). The tool cannot parallelise itself via ${task.cpus} without this value.",
+      "evidence": "",
+      "recommendation": "Add a cpus directive appropriate for the tool's parallelism:\n    cpus 4\n\nReference the allocation in the script block so the tool actually uses the provisioned cores:\n    bwa mem -t ${task.cpus} ...\n\nFor workflows that need to scale, consider a dynamic expression:\n    cpus { reads.size() > 5.GB ? 8 : 4 }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "RESOURCE-002",
+      "process_name": "INTERPROSCAN",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 233,
+        "line_end": 291
+      },
+      "description": "Process 'INTERPROSCAN' has no memory directive. Cloud schedulers cannot reserve sufficient RAM without an explicit declaration. Memory-hungry bioinformatics tools (aligners, variant callers) will be killed by OOM errors on instances with inadequate RAM, with no meaningful error message.",
+      "evidence": "",
+      "recommendation": "Add a memory directive sized for the tool's peak usage:\n    memory '8 GB'\n\nFor resilient pipelines, combine with an error strategy that increases memory on retry:\n    errorStrategy 'retry'\n    maxRetries 2\n    memory { (8.GB * task.attempt).clamp(null, 32.GB) }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "MULTIQC",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 295,
+        "line_end": 349
+      },
+      "description": "Process 'MULTIQC' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n\nFor Snakemake, use a singularity directive:\n    singularity: \"docker://quay.io/biocontainers/tool:1.0.0\"",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "RESOURCE-001",
+      "process_name": "MULTIQC",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 295,
+        "line_end": 349
+      },
+      "description": "Process 'MULTIQC' has no cpus directive. Cloud schedulers cannot allocate the correct number of CPU cores without an explicit declaration, leading to either over-provisioning (wasted cost) or under-provisioning (slow or failed runs). The tool cannot parallelise itself via ${task.cpus} without this value.",
+      "evidence": "",
+      "recommendation": "Add a cpus directive appropriate for the tool's parallelism:\n    cpus 4\n\nReference the allocation in the script block so the tool actually uses the provisioned cores:\n    bwa mem -t ${task.cpus} ...\n\nFor workflows that need to scale, consider a dynamic expression:\n    cpus { reads.size() > 5.GB ? 8 : 4 }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "RESOURCE-002",
+      "process_name": "MULTIQC",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 295,
+        "line_end": 349
+      },
+      "description": "Process 'MULTIQC' has no memory directive. Cloud schedulers cannot reserve sufficient RAM without an explicit declaration. Memory-hungry bioinformatics tools (aligners, variant callers) will be killed by OOM errors on instances with inadequate RAM, with no meaningful error message.",
+      "evidence": "",
+      "recommendation": "Add a memory directive sized for the tool's peak usage:\n    memory '8 GB'\n\nFor resilient pipelines, combine with an error strategy that increases memory on retry:\n    errorStrategy 'retry'\n    maxRetries 2\n    memory { (8.GB * task.attempt).clamp(null, 32.GB) }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "S4PRED_RUNMODEL",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 353,
+        "line_end": 404
+      },
+      "description": "Process 'S4PRED_RUNMODEL' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n\nFor Snakemake, use a singularity directive:\n    singularity: \"docker://quay.io/biocontainers/tool:1.0.0\"",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "S4PRED_RUNMODEL",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 353,
+        "line_end": 404
+      },
+      "description": "Process 'S4PRED_RUNMODEL' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "//",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "RESOURCE-001",
+      "process_name": "S4PRED_RUNMODEL",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 353,
+        "line_end": 404
+      },
+      "description": "Process 'S4PRED_RUNMODEL' has no cpus directive. Cloud schedulers cannot allocate the correct number of CPU cores without an explicit declaration, leading to either over-provisioning (wasted cost) or under-provisioning (slow or failed runs). The tool cannot parallelise itself via ${task.cpus} without this value.",
+      "evidence": "",
+      "recommendation": "Add a cpus directive appropriate for the tool's parallelism:\n    cpus 4\n\nReference the allocation in the script block so the tool actually uses the provisioned cores:\n    bwa mem -t ${task.cpus} ...\n\nFor workflows that need to scale, consider a dynamic expression:\n    cpus { reads.size() > 5.GB ? 8 : 4 }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "RESOURCE-002",
+      "process_name": "S4PRED_RUNMODEL",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 353,
+        "line_end": 404
+      },
+      "description": "Process 'S4PRED_RUNMODEL' has no memory directive. Cloud schedulers cannot reserve sufficient RAM without an explicit declaration. Memory-hungry bioinformatics tools (aligners, variant callers) will be killed by OOM errors on instances with inadequate RAM, with no meaningful error message.",
+      "evidence": "",
+      "recommendation": "Add a memory directive sized for the tool's peak usage:\n    memory '8 GB'\n\nFor resilient pipelines, combine with an error strategy that increases memory on retry:\n    errorStrategy 'retry'\n    maxRetries 2\n    memory { (8.GB * task.attempt).clamp(null, 32.GB) }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "SEQFU_STATS",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 408,
+        "line_end": 459
+      },
+      "description": "Process 'SEQFU_STATS' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n\nFor Snakemake, use a singularity directive:\n    singularity: \"docker://quay.io/biocontainers/tool:1.0.0\"",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "RESOURCE-001",
+      "process_name": "SEQFU_STATS",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 408,
+        "line_end": 459
+      },
+      "description": "Process 'SEQFU_STATS' has no cpus directive. Cloud schedulers cannot allocate the correct number of CPU cores without an explicit declaration, leading to either over-provisioning (wasted cost) or under-provisioning (slow or failed runs). The tool cannot parallelise itself via ${task.cpus} without this value.",
+      "evidence": "",
+      "recommendation": "Add a cpus directive appropriate for the tool's parallelism:\n    cpus 4\n\nReference the allocation in the script block so the tool actually uses the provisioned cores:\n    bwa mem -t ${task.cpus} ...\n\nFor workflows that need to scale, consider a dynamic expression:\n    cpus { reads.size() > 5.GB ? 8 : 4 }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "RESOURCE-002",
+      "process_name": "SEQFU_STATS",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 408,
+        "line_end": 459
+      },
+      "description": "Process 'SEQFU_STATS' has no memory directive. Cloud schedulers cannot reserve sufficient RAM without an explicit declaration. Memory-hungry bioinformatics tools (aligners, variant callers) will be killed by OOM errors on instances with inadequate RAM, with no meaningful error message.",
+      "evidence": "",
+      "recommendation": "Add a memory directive sized for the tool's peak usage:\n    memory '8 GB'\n\nFor resilient pipelines, combine with an error strategy that increases memory on retry:\n    errorStrategy 'retry'\n    maxRetries 2\n    memory { (8.GB * task.attempt).clamp(null, 32.GB) }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "SEQKIT_REPLACE",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 463,
+        "line_end": 514
+      },
+      "description": "Process 'SEQKIT_REPLACE' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n\nFor Snakemake, use a singularity directive:\n    singularity: \"docker://quay.io/biocontainers/tool:1.0.0\"",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "SEQKIT_REPLACE",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 463,
+        "line_end": 514
+      },
+      "description": "Process 'SEQKIT_REPLACE' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "/., /.",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "RESOURCE-001",
+      "process_name": "SEQKIT_REPLACE",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 463,
+        "line_end": 514
+      },
+      "description": "Process 'SEQKIT_REPLACE' has no cpus directive. Cloud schedulers cannot allocate the correct number of CPU cores without an explicit declaration, leading to either over-provisioning (wasted cost) or under-provisioning (slow or failed runs). The tool cannot parallelise itself via ${task.cpus} without this value.",
+      "evidence": "",
+      "recommendation": "Add a cpus directive appropriate for the tool's parallelism:\n    cpus 4\n\nReference the allocation in the script block so the tool actually uses the provisioned cores:\n    bwa mem -t ${task.cpus} ...\n\nFor workflows that need to scale, consider a dynamic expression:\n    cpus { reads.size() > 5.GB ? 8 : 4 }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "RESOURCE-002",
+      "process_name": "SEQKIT_REPLACE",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 463,
+        "line_end": 514
+      },
+      "description": "Process 'SEQKIT_REPLACE' has no memory directive. Cloud schedulers cannot reserve sufficient RAM without an explicit declaration. Memory-hungry bioinformatics tools (aligners, variant callers) will be killed by OOM errors on instances with inadequate RAM, with no meaningful error message.",
+      "evidence": "",
+      "recommendation": "Add a memory directive sized for the tool's peak usage:\n    memory '8 GB'\n\nFor resilient pipelines, combine with an error strategy that increases memory on retry:\n    errorStrategy 'retry'\n    maxRetries 2\n    memory { (8.GB * task.attempt).clamp(null, 32.GB) }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "SEQKIT_RMDUP",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 518,
+        "line_end": 583
+      },
+      "description": "Process 'SEQKIT_RMDUP' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n\nFor Snakemake, use a singularity directive:\n    singularity: \"docker://quay.io/biocontainers/tool:1.0.0\"",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "SEQKIT_RMDUP",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 518,
+        "line_end": 583
+      },
+      "description": "Process 'SEQKIT_RMDUP' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "/., //, /rmdup ... (1 more)",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "RESOURCE-001",
+      "process_name": "SEQKIT_RMDUP",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 518,
+        "line_end": 583
+      },
+      "description": "Process 'SEQKIT_RMDUP' has no cpus directive. Cloud schedulers cannot allocate the correct number of CPU cores without an explicit declaration, leading to either over-provisioning (wasted cost) or under-provisioning (slow or failed runs). The tool cannot parallelise itself via ${task.cpus} without this value.",
+      "evidence": "",
+      "recommendation": "Add a cpus directive appropriate for the tool's parallelism:\n    cpus 4\n\nReference the allocation in the script block so the tool actually uses the provisioned cores:\n    bwa mem -t ${task.cpus} ...\n\nFor workflows that need to scale, consider a dynamic expression:\n    cpus { reads.size() > 5.GB ? 8 : 4 }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "RESOURCE-002",
+      "process_name": "SEQKIT_RMDUP",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 518,
+        "line_end": 583
+      },
+      "description": "Process 'SEQKIT_RMDUP' has no memory directive. Cloud schedulers cannot reserve sufficient RAM without an explicit declaration. Memory-hungry bioinformatics tools (aligners, variant callers) will be killed by OOM errors on instances with inadequate RAM, with no meaningful error message.",
+      "evidence": "",
+      "recommendation": "Add a memory directive sized for the tool's peak usage:\n    memory '8 GB'\n\nFor resilient pipelines, combine with an error strategy that increases memory on retry:\n    errorStrategy 'retry'\n    maxRetries 2\n    memory { (8.GB * task.attempt).clamp(null, 32.GB) }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "SEQKIT_SEQ",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 587,
+        "line_end": 653
+      },
+      "description": "Process 'SEQKIT_SEQ' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n\nFor Snakemake, use a singularity directive:\n    singularity: \"docker://quay.io/biocontainers/tool:1.0.0\"",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "STORAGE-001",
+      "process_name": "SEQKIT_SEQ",
+      "category": "storage",
+      "severity": "MAJOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 587,
+        "line_end": 653
+      },
+      "description": "Process 'SEQKIT_SEQ' contains hardcoded absolute paths in its script block. These paths will not exist on cloud execution environments.",
+      "evidence": "/.",
+      "recommendation": "Replace hardcoded paths with Nextflow input parameters. Reference files should be declared in the input: block and passed in via a params file or the workflow's input channel.",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "RESOURCE-001",
+      "process_name": "SEQKIT_SEQ",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 587,
+        "line_end": 653
+      },
+      "description": "Process 'SEQKIT_SEQ' has no cpus directive. Cloud schedulers cannot allocate the correct number of CPU cores without an explicit declaration, leading to either over-provisioning (wasted cost) or under-provisioning (slow or failed runs). The tool cannot parallelise itself via ${task.cpus} without this value.",
+      "evidence": "",
+      "recommendation": "Add a cpus directive appropriate for the tool's parallelism:\n    cpus 4\n\nReference the allocation in the script block so the tool actually uses the provisioned cores:\n    bwa mem -t ${task.cpus} ...\n\nFor workflows that need to scale, consider a dynamic expression:\n    cpus { reads.size() > 5.GB ? 8 : 4 }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "RESOURCE-002",
+      "process_name": "SEQKIT_SEQ",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 587,
+        "line_end": 653
+      },
+      "description": "Process 'SEQKIT_SEQ' has no memory directive. Cloud schedulers cannot reserve sufficient RAM without an explicit declaration. Memory-hungry bioinformatics tools (aligners, variant callers) will be killed by OOM errors on instances with inadequate RAM, with no meaningful error message.",
+      "evidence": "",
+      "recommendation": "Add a memory directive sized for the tool's peak usage:\n    memory '8 GB'\n\nFor resilient pipelines, combine with an error strategy that increases memory on retry:\n    errorStrategy 'retry'\n    maxRetries 2\n    memory { (8.GB * task.attempt).clamp(null, 32.GB) }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "SEQKIT_STATS",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 657,
+        "line_end": 692
+      },
+      "description": "Process 'SEQKIT_STATS' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n\nFor Snakemake, use a singularity directive:\n    singularity: \"docker://quay.io/biocontainers/tool:1.0.0\"",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "RESOURCE-001",
+      "process_name": "SEQKIT_STATS",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 657,
+        "line_end": 692
+      },
+      "description": "Process 'SEQKIT_STATS' has no cpus directive. Cloud schedulers cannot allocate the correct number of CPU cores without an explicit declaration, leading to either over-provisioning (wasted cost) or under-provisioning (slow or failed runs). The tool cannot parallelise itself via ${task.cpus} without this value.",
+      "evidence": "",
+      "recommendation": "Add a cpus directive appropriate for the tool's parallelism:\n    cpus 4\n\nReference the allocation in the script block so the tool actually uses the provisioned cores:\n    bwa mem -t ${task.cpus} ...\n\nFor workflows that need to scale, consider a dynamic expression:\n    cpus { reads.size() > 5.GB ? 8 : 4 }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "RESOURCE-002",
+      "process_name": "SEQKIT_STATS",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 657,
+        "line_end": 692
+      },
+      "description": "Process 'SEQKIT_STATS' has no memory directive. Cloud schedulers cannot reserve sufficient RAM without an explicit declaration. Memory-hungry bioinformatics tools (aligners, variant callers) will be killed by OOM errors on instances with inadequate RAM, with no meaningful error message.",
+      "evidence": "",
+      "recommendation": "Add a memory directive sized for the tool's peak usage:\n    memory '8 GB'\n\nFor resilient pipelines, combine with an error strategy that increases memory on retry:\n    errorStrategy 'retry'\n    maxRetries 2\n    memory { (8.GB * task.attempt).clamp(null, 32.GB) }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "CONTAINER-001",
+      "process_name": "UNTAR",
+      "category": "containerization",
+      "severity": "CRITICAL",
+      "location": {
+        "file": "main.nf",
+        "line_start": 696,
+        "line_end": 770
+      },
+      "description": "Process 'UNTAR' has no container directive. It cannot run portably on any WES-compliant cloud platform.",
+      "evidence": "",
+      "recommendation": "Add a container directive with a pinned image, e.g.:\n    container 'quay.io/biocontainers/tool:1.0.0'\n\nFor Snakemake, use a singularity directive:\n    singularity: \"docker://quay.io/biocontainers/tool:1.0.0\"",
+      "auto_fixable": true
+    },
+    {
+      "gap_id": "RESOURCE-001",
+      "process_name": "UNTAR",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 696,
+        "line_end": 770
+      },
+      "description": "Process 'UNTAR' has no cpus directive. Cloud schedulers cannot allocate the correct number of CPU cores without an explicit declaration, leading to either over-provisioning (wasted cost) or under-provisioning (slow or failed runs). The tool cannot parallelise itself via ${task.cpus} without this value.",
+      "evidence": "",
+      "recommendation": "Add a cpus directive appropriate for the tool's parallelism:\n    cpus 4\n\nReference the allocation in the script block so the tool actually uses the provisioned cores:\n    bwa mem -t ${task.cpus} ...\n\nFor workflows that need to scale, consider a dynamic expression:\n    cpus { reads.size() > 5.GB ? 8 : 4 }",
+      "auto_fixable": false
+    },
+    {
+      "gap_id": "RESOURCE-002",
+      "process_name": "UNTAR",
+      "category": "resource_hints",
+      "severity": "MINOR",
+      "location": {
+        "file": "main.nf",
+        "line_start": 696,
+        "line_end": 770
+      },
+      "description": "Process 'UNTAR' has no memory directive. Cloud schedulers cannot reserve sufficient RAM without an explicit declaration. Memory-hungry bioinformatics tools (aligners, variant callers) will be killed by OOM errors on instances with inadequate RAM, with no meaningful error message.",
       "evidence": "",
       "recommendation": "Add a memory directive sized for the tool's peak usage:\n    memory '8 GB'\n\nFor resilient pipelines, combine with an error strategy that increases memory on retry:\n    errorStrategy 'retry'\n    maxRetries 2\n    memory { (8.GB * task.attempt).clamp(null, 32.GB) }",
       "auto_fixable": false
     }
   ],
   "summary": {
-    "total_gaps": 9,
-    "critical": 2,
-    "major": 3,
-    "minor": 4,
+    "total_gaps": 39,
+    "critical": 11,
+    "major": 6,
+    "minor": 22,
     "info": 0,
-    "auto_fixable_count": 2,
-    "cloud_readiness_score": 0.08
+    "auto_fixable_count": 11,
+    "cloud_readiness_score": 0.0
   }
 }

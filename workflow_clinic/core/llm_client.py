@@ -56,20 +56,24 @@ class LLMClient:
             )
 
     def _ollama(self, prompt: str) -> str:
-        model    = os.environ["OLLAMA_MODEL"]
-        base_url = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+            model    = os.environ["OLLAMA_MODEL"]
+            base_url = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+            # OLLAMA_TIMEOUT lets you override the default without editing code.
+            # Increase it if your model runs on CPU and needs more than 2 minutes.
+            # Set to 0 for no timeout (useful on slow hardware).
+            timeout  = float(os.getenv("OLLAMA_TIMEOUT", "900"))
 
-        def _call() -> str:
-            resp = httpx.post(
-                f"{base_url}/api/generate",
-                json={"model": model, "prompt": prompt, "stream": False},
-                timeout=120,
-            )
-            resp.raise_for_status()
-            result: str = resp.json()["response"].strip()
-            return result
+            def _call() -> str:
+                resp = httpx.post(
+                    f"{base_url}/api/generate",
+                    json={"model": model, "prompt": prompt, "stream": False},
+                    timeout=timeout if timeout > 0 else None,
+                )
+                resp.raise_for_status()
+                result: str = resp.json()["response"].strip()
+                return result
 
-        return _with_backoff(_call)
+            return _with_backoff(_call)
 
     def _openai(self, prompt: str) -> str:
         def _call() -> str:

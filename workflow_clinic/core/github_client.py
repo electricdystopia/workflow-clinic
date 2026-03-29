@@ -42,6 +42,60 @@ import httpx
 
 _API_BASE = "https://api.github.com"
 
+class GitHubIssuesDisabledError(Exception):
+    """Raised when the target repository has Issues disabled (HTTP 410)."""
+    def __init__(self, owner: str, repo: str) -> None:
+        super().__init__(
+            f"Issues are disabled on {owner}/{repo}. "
+            "Enable them under Settings → Features → Issues, "
+            "or choose a different repository."
+        )
+
+    def create_issue(
+        self,
+        owner: str,
+        repo: str,
+        title: str,
+        body: str,
+        labels: list[str],
+    ) -> str:
+        if labels:
+            self.ensure_labels(owner, repo, labels)
+
+        with httpx.Client(timeout=30) as client:
+            resp = client.post(
+                f"{_API_BASE}/repos/{owner}/{repo}/issues",
+                headers=self._headers,
+                json={"title": title, "body": body, "labels": labels},
+            )
+            if resp.status_code == 410:
+                raise GitHubIssuesDisabledError(owner, repo)
+            resp.raise_for_status()
+            return str(resp.json()["html_url"])
+
+    def find_existing_issue(
+        self, owner: str, repo: str, title_fragment: str
+    ) -> int | None:
+        with httpx.Client(timeout=30) as client:
+            resp = client.get(
+                f"{_API_BASE}/repos/{owner}/{repo}/issues",
+                headers=self._headers,
+                params={
+                    "labels":   "workflow-clinic",
+                    "state":    "open",
+                    "per_page": 100,
+                },
+            )
+            if resp.status_code == 410:
+                raise GitHubIssuesDisabledError(owner, repo)
+            resp.raise_for_status()
+            issues: list[dict[str, Any]] = resp.json()
+
+        for issue in issues:
+            if title_fragment in issue.get("title", ""):
+                return int(issue["number"])
+        return None
+
 # ── Label colours ─────────────────────────────────────────────────────────────
 # GitHub requires a 6-digit hex string without the leading "#".
 # Colours are chosen to be visually distinct in the GitHub issue tracker.

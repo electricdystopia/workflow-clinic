@@ -19,6 +19,7 @@ from workflow_clinic.critic.engine import CriticEngine
 from workflow_clinic.parsers.nextflow import NextflowParser
 from workflow_clinic.parsers.registry import ParserRegistry
 from workflow_clinic.schema.gap_report import GapReport, Severity
+from workflow_clinic.core.github_client import GitHubClient, GitHubIssuesDisabledError
 
 from workflow_clinic.doctor.engine import DoctorEngine
 from workflow_clinic.doctor.fix_generators.base import FixProposal
@@ -270,28 +271,47 @@ def _resolve_repo(repo_flag: str | None, source: str) -> str | None:
     """
     Return 'owner/repo' from the explicit --repo flag or inferred from source.
 
-    Handles the four source formats the CLI accepts:
+    --repo accepts three forms:
+        owner/repo                          (canonical)
+        https://github.com/owner/repo      (full URL — normalised here)
+        github.com/owner/repo              (URL without scheme — normalised here)
+
+    Source inference handles:
         dockstore:github.com/owner/repo
         https://github.com/owner/repo
         github:owner/repo
         github.com/owner/repo
+
     Returns None for local file paths — the caller must require --repo.
     """
-    if repo_flag:
-        return repo_flag
-    for prefix in (
-        "dockstore:github.com/",
+    _URL_PREFIXES = (
         "https://github.com/",
+        "http://github.com/",
         "github.com/",
         "github:",
-    ):
-        if prefix in source:
-            tail  = source.split(prefix, 1)[1]
-            parts = tail.split("/")
-            if len(parts) >= 2:
-                return f"{parts[0]}/{parts[1]}"
-    return None
+        "dockstore:github.com/",
+    )
 
+    def _strip_to_owner_repo(s: str) -> str | None:
+        """Return 'owner/repo' from any of the supported string forms."""
+        for prefix in _URL_PREFIXES:
+            if s.startswith(prefix) or prefix in s:
+                tail  = s.split(prefix, 1)[1]
+                parts = [p for p in tail.split("/") if p]
+                if len(parts) >= 2:
+                    return f"{parts[0]}/{parts[1]}"
+        # Already in owner/repo form — no prefix matched
+        if s.count("/") == 1 and not s.startswith("http"):
+            return s
+        return None
+
+    if repo_flag:
+        normalised = _strip_to_owner_repo(repo_flag)
+        # If normalisation failed (unrecognised format) return as-is and let
+        # the caller's format check catch it with a clear error message.
+        return normalised if normalised else repo_flag
+
+    return _strip_to_owner_repo(source)
 
 def _render_pr_body(proposal: "FixProposal") -> str:
     """
@@ -346,15 +366,6 @@ def _submit_issue_to_github(
     source: str,
     repo_flag: str | None,
 ) -> None:
-    """
-    POST the gap report as a GitHub issue, or add a comment if one exists.
-
-    Reads GITHUB_TOKEN from the environment.  Parses owner/repo from
-    --repo or infers it from the source URL.  Checks for an existing open
-    issue with the workflow-clinic label before creating a new one
-    (deduplication prevents the bot from spamming a repository with
-    duplicate issues on every CI run).
-    """
     token = os.getenv("GITHUB_TOKEN")
     if not token:
         err_console.print(
@@ -364,11 +375,17 @@ def _submit_issue_to_github(
         raise typer.Exit(1)
 
     repo_str = _resolve_repo(repo_flag, source)
-    if not repo_str or "/" not in repo_str:
+    if (
+        not repo_str
+        or "/" not in repo_str
+        or repo_str.count("/") != 1
+        or repo_str.startswith("http")
+        or repo_str.startswith("github")
+    ):
         err_console.print(
-            "[red]Cannot determine the target repository.[/red]\n"
-            "  Pass [bold]--repo owner/repo[/bold] explicitly, or use a GitHub "
-            "source URL so it can be inferred automatically."
+            f"[red]Invalid repository '[bold]{repo_str}[/bold]'.[/red]\n"
+            "  --repo must be in [bold]owner/repo[/bold] format, "
+            "e.g. [bold]electricdystopia/proteinannotator[/bold]."
         )
         raise typer.Exit(1)
 
@@ -376,30 +393,44 @@ def _submit_issue_to_github(
     title, body      = _render_github_issue(report)
     labels           = _issue_labels(report)
 
-    from workflow_clinic.core.github_client import GitHubClient
     client = GitHubClient(token)
 
-    # Deduplication: search for an existing open WC issue on this repo.
-    # We use "[Workflow Clinic]" as the title marker — it is present in every
-    # title produced by _render_github_issue().
-    existing = client.find_existing_issue(owner, repo_name, "[Workflow Clinic]")
-
-    if existing is not None:
-        console.print(
-            f"[yellow]Open issue #{existing} already exists for this repo. "
-            f"Appending the updated report as a comment.[/yellow]"
+    try:
+        existing = client.find_existing_issue(owner, repo_name, "[Workflow Clinic]")
+    except GitHubIssuesDisabledError as exc:
+        err_console.print(f"[red]Cannot submit issue:[/red] {exc}")
+        err_console.print(
+            "[dim]Tip: use [bold]--issue-output report.md[/bold] to save the "
+            "draft locally instead.[/dim]"
         )
-        comment_body = (
-            "## 📋 Updated Workflow Clinic Report\n\n"
-            f"_(Re-run on {report.generated_at.strftime('%Y-%m-%d %H:%M UTC')})_\n\n"
-            + body
-        )
-        url = client.add_comment(owner, repo_name, existing, comment_body)
-        console.print(f"[green]✓ Comment added:[/green] {url}")
-    else:
-        url = client.create_issue(owner, repo_name, title, body, labels)
-        console.print(f"[green]✓ Issue created:[/green] {url}")
+        raise typer.Exit(1)
 
+    try:
+        if existing is not None:
+            console.print(
+                f"[yellow]Open issue #{existing} already exists for this repo. "
+                f"Appending the updated report as a comment.[/yellow]"
+            )
+            comment_body = (
+                "## 📋 Updated Workflow Clinic Report\n\n"
+                f"_(Re-run on {report.generated_at.strftime('%Y-%m-%d %H:%M UTC')})_\n\n"
+                + body
+            )
+            url = client.add_comment(owner, repo_name, existing, comment_body)
+            console.print(f"[green]✓ Comment added:[/green] {url}")
+        else:
+            url = client.create_issue(owner, repo_name, title, body, labels)
+            console.print(f"[green]✓ Issue created:[/green] {url}")
+    except GitHubIssuesDisabledError as exc:
+        err_console.print(f"[red]Cannot submit issue:[/red] {exc}")
+        err_console.print(
+            "[dim]Tip: use [bold]--issue-output report.md[/bold] to save the "
+            "draft locally instead.[/dim]"
+        )
+        raise typer.Exit(1)
+    except Exception as exc:
+        err_console.print(f"[red]GitHub API error:[/red] {exc}")
+        raise typer.Exit(1)
 
 def _submit_pr_to_github(
     proposal:      "FixProposal",
@@ -429,12 +460,19 @@ def _submit_pr_to_github(
         )
         raise typer.Exit(1)
 
-    if not repo_flag or "/" not in repo_flag:
-        err_console.print(
-            "[red]--create-pr requires --repo owner/repo.[/red]\n"
-            "  The target repository cannot be inferred from a local file path."
-        )
-        raise typer.Exit(1)
+    if (
+            not repo_flag
+            or "/" not in repo_flag
+            or repo_flag.count("/") != 1
+            or repo_flag.startswith("http")
+            or repo_flag.startswith("github")
+        ):
+            err_console.print(
+                f"[red]--create-pr requires --repo in [bold]owner/repo[/bold] format.[/red]\n"
+                "  e.g. [bold]--repo electricdystopia/proteinannotator[/bold]\n"
+                "  Do not pass a full URL."
+            )
+            raise typer.Exit(1)
 
     owner, repo_name = repo_flag.split("/", 1)
     client           = GitHubClient(token)
@@ -828,7 +866,22 @@ def _render_markdown(report: GapReport) -> str:
 
 @app.command("doctor")
 def doctor(
-    path: Path = typer.Argument(..., help="Path to a .nf or .smk workflow file"),
+    path: Path | None = typer.Argument(
+        None,
+        help=(
+            "Path to a local .nf or .smk workflow file. "
+            "Omit when using --source for remote workflows."
+        ),
+    ),
+    source: str | None = typer.Option(
+        None, "--source", "-s",
+        help=(
+            "Remote workflow source (same formats as `critic`):\n\n"
+            "  https://github.com/owner/repo\n\n"
+            "  dockstore:github.com/owner/repo\n\n"
+            "When given, --repo is inferred automatically."
+        ),
+    ),
     gap: str | None = typer.Option(
         None, "--gap", "-g",
         help="Only fix gaps with this ID, e.g. CONTAINER-001.",
@@ -846,22 +899,64 @@ def doctor(
     ),
     branch_prefix: str = typer.Option(
         "wf-clinic", "--branch-prefix",
-        help="Branch name prefix for fix branches (default: wf-clinic). "
-             "The full branch name is {prefix}/{gap-id}/{process-name}.",
+        help="Branch name prefix for fix branches (default: wf-clinic).",
     ),
     repo: str | None = typer.Option(
         None, "--repo",
-        help="Target GitHub repository as owner/repo (required for --create-pr).",
+        help=(
+            "Target GitHub repository as owner/repo. "
+            "Inferred automatically from --source when source is a GitHub URL."
+        ),
     ),
 ) -> None:
     """Generate and optionally submit fixes for auto-fixable gaps."""
-    if not path.exists():
-        err_console.print(f"[red]File not found:[/red] {path}")
+
+    # ── Resolve source → local file content + display path ───────────────────
+    if source is not None and path is not None:
+        err_console.print(
+            "[red]Pass either a local path or --source, not both.[/red]"
+        )
         raise typer.Exit(1)
 
-    source       = path.read_text(encoding="utf-8")
-    source_lines = source.splitlines(keepends=True)
-    workflow     = ParserRegistry().get_parser(path).parse_file(path)
+    if source is not None:
+        # Remote path — fetch all .nf files exactly as `critic` does
+        from workflow_clinic.core.fetcher import fetch
+        try:
+            fetched = fetch(source, full_repo=True)
+        except Exception as exc:
+            err_console.print(f"[red]Fetch failed:[/red] {exc}")
+            raise typer.Exit(1)
+
+        source_text   = fetched.content
+        display_path  = Path(fetched.filename)
+        workflow      = NextflowParser().parse(fetched.content, display_path)
+        # For --create-pr we need a path object to derive the filename;
+        # use the fetched filename as a stand-in.
+        effective_path = display_path
+        # Infer --repo from source URL if not given explicitly
+        if repo is None:
+            repo = _resolve_repo(None, source)
+
+    elif path is not None:
+        if not path.exists():
+            err_console.print(f"[red]File not found:[/red] {path}")
+            raise typer.Exit(1)
+        source_text    = path.read_text(encoding="utf-8")
+        display_path   = path
+        effective_path = path
+        workflow       = ParserRegistry().get_parser(path).parse_file(path)
+
+    else:
+        err_console.print(
+            "[red]Provide a local file path or --source for a remote workflow.[/red]\n"
+            "  workflow-clinic doctor main.nf --gap CONTAINER-001\n"
+            "  workflow-clinic doctor --source https://github.com/owner/repo "
+            "--gap CONTAINER-001 --create-pr"
+        )
+        raise typer.Exit(1)
+
+    # ── Run critic ────────────────────────────────────────────────────────────
+    source_lines = source_text.splitlines(keepends=True)
     report       = CriticEngine().run(workflow)
 
     if gap:
@@ -876,7 +971,7 @@ def doctor(
         console.print("[yellow]No auto-fixable gaps found.[/yellow]")
         raise typer.Exit(0)
 
-    console.print(f"\n[bold cyan]Workflow Doctor[/bold cyan] — {path}")
+    console.print(f"\n[bold cyan]Workflow Doctor[/bold cyan] — {display_path}")
     console.print(f"[dim]Auto-fixable gaps: {len(auto_fixable)}[/dim]\n")
 
     proposals = DoctorEngine().run(report, source_lines)
@@ -886,7 +981,7 @@ def doctor(
         raise typer.Exit(0)
 
     if output:
-        rendered = _render_doctor_json(proposals, path)
+        rendered = _render_doctor_json(proposals, display_path)
         output.write_text(rendered, encoding="utf-8")
         console.print(f"[dim]Fix proposals saved to {output}[/dim]\n")
 
@@ -917,7 +1012,7 @@ def doctor(
                     console.print(line)
         console.print()
 
-    # ── --create-pr: commit each validated fix and open a PR ─────────────────
+    # ── --create-pr ───────────────────────────────────────────────────────────
     if create_pr:
         submitted = 0
         for proposal in proposals:
@@ -934,7 +1029,7 @@ def doctor(
                     f"— no patched content available.[/yellow]"
                 )
                 continue
-            _submit_pr_to_github(proposal, path, repo, branch_prefix)
+            _submit_pr_to_github(proposal, effective_path, repo, branch_prefix)
             submitted += 1
 
         if submitted == 0:
@@ -942,7 +1037,6 @@ def doctor(
                 "[yellow]No proposals were suitable for PR creation. "
                 "Run without --create-pr to review diffs manually.[/yellow]"
             )
-
 
 def _serialize_proposals(proposals: list[FixProposal]) -> list[dict[str, object]]:
     return [dataclasses.asdict(p) for p in proposals]
